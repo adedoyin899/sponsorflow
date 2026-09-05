@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "./supabase-server";
-import { Database } from "@/types/database";
+import { Database, OutreachStatus } from "@/types/database";
 
 type UserRow = Database["public"]["Tables"]["users"]["Row"];
 type SendLimitsRow = Database["public"]["Tables"]["send_limits"]["Row"];
@@ -651,4 +651,161 @@ export async function getCompaniesForUser(
   const { data } = await query as unknown as { data: CompanyRow[] | null };
   return data || [];
 }
+
+// ==============================================================================
+// OUTREACH EMAILS PIPELINE
+// ==============================================================================
+
+type OutreachEmailRow = Database["public"]["Tables"]["outreach_emails"]["Row"];
+
+export interface SaveEmailDraftInput {
+  company_id: string;
+  contact_id?: string | null;
+  to_email: string;
+  to_name?: string | null;
+  subject: string;
+  body: string;
+  ai_model?: string;
+  ai_positioning_angle?: string | null;
+  ai_confidence?: number;
+  status?: OutreachStatus;
+}
+
+export async function saveEmailDraft(
+  userId: string,
+  input: SaveEmailDraftInput
+): Promise<OutreachEmailRow> {
+  const supabase = createServerSupabaseClient();
+
+  // Check if an active draft already exists for this company & contact
+  let existingQuery = supabase
+    .from("outreach_emails")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("company_id", input.company_id)
+    .in("status", ["draft", "ready_to_send", "rejected"]);
+
+  if (input.contact_id) {
+    existingQuery = existingQuery.eq("contact_id", input.contact_id);
+  }
+
+  const { data: existingList } = await (existingQuery as unknown as Promise<{ data: { id: string }[] | null }>);
+
+  if (existingList && existingList.length > 0) {
+    // Update existing draft
+    const existingId = existingList[0].id;
+    const { data, error } = await (supabase
+      .from("outreach_emails")
+      .update({
+        to_email: input.to_email,
+        to_name: input.to_name || null,
+        subject: input.subject,
+        body: input.body,
+        ai_model: input.ai_model || "claude-3-5-sonnet-20241022",
+        ai_positioning_angle: input.ai_positioning_angle || null,
+        ai_confidence: input.ai_confidence ?? 0.95,
+        status: input.status || "draft",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existingId)
+      .select()
+      .single() as unknown as Promise<{ data: OutreachEmailRow | null; error: { message: string } | null }>);
+
+    if (error || !data) {
+      throw new Error(error?.message || "Failed to update email draft");
+    }
+    return data;
+  }
+
+  // Create new draft
+  const { data, error } = await (supabase
+    .from("outreach_emails")
+    .insert({
+      user_id: userId,
+      company_id: input.company_id,
+      contact_id: input.contact_id || null,
+      to_email: input.to_email,
+      to_name: input.to_name || null,
+      subject: input.subject,
+      body: input.body,
+      status: input.status || "draft",
+      ai_model: input.ai_model || "claude-3-5-sonnet-20241022",
+      ai_positioning_angle: input.ai_positioning_angle || null,
+      ai_confidence: input.ai_confidence ?? 0.95,
+      approved_by_user: false,
+    })
+    .select()
+    .single() as unknown as Promise<{ data: OutreachEmailRow | null; error: { message: string } | null }>);
+
+  if (error || !data) {
+    throw new Error(error?.message || "Failed to insert email draft");
+  }
+
+  return data;
+}
+
+export async function getEmailsForUser(
+  userId: string,
+  filter?: { status?: string; companyId?: string }
+): Promise<Array<OutreachEmailRow & { company?: CompanyRow | null }>> {
+  const supabase = createServerSupabaseClient();
+  let query = supabase
+    .from("outreach_emails")
+    .select("*, company:companies(*)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (filter?.status && filter.status !== "all") {
+    query = query.eq("status", filter.status);
+  }
+
+  if (filter?.companyId) {
+    query = query.eq("company_id", filter.companyId);
+  }
+
+  const { data } = await (query as unknown as Promise<{ data: Array<OutreachEmailRow & { company?: CompanyRow | null }> | null }>);
+  return data || [];
+}
+
+export async function updateEmailStatus(
+  userId: string,
+  emailId: string,
+  params: {
+    status: OutreachStatus;
+    subject?: string;
+    body?: string;
+    userEdits?: string;
+  }
+): Promise<OutreachEmailRow> {
+  const supabase = createServerSupabaseClient();
+
+  const updateData: Record<string, unknown> = {
+    status: params.status,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (params.subject !== undefined) updateData.subject = params.subject;
+  if (params.body !== undefined) updateData.body = params.body;
+  if (params.userEdits !== undefined) updateData.user_edits = params.userEdits;
+
+  if (params.status === "ready_to_send") {
+    updateData.approved_by_user = true;
+    updateData.approved_at = new Date().toISOString();
+  }
+
+  const { data, error } = await (supabase
+    .from("outreach_emails")
+    .update(updateData)
+    .eq("id", emailId)
+    .eq("user_id", userId)
+    .select()
+    .single() as unknown as Promise<{ data: OutreachEmailRow | null; error: { message: string } | null }>);
+
+  if (error || !data) {
+    throw new Error(error?.message || "Failed to update email status");
+  }
+
+  return data;
+}
+
 
