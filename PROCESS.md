@@ -45,7 +45,7 @@
 ## 4. 🗺️ Phase 1 Roadmap & Build Progress
 
 ```
-[Prompt 1]  Database Schema & RLS Migrations          [Pending]
+[Prompt 1]  Database Schema & RLS Migrations          [Completed ✅]
 [Prompt 2]  Next.js 14 Setup + Tailwind Design System [Pending]
 [Prompt 3]  Email/Password Auth + Session Guard       [Pending]
 [Prompt 4]  Google OAuth 2.0 Authentication           [Pending]
@@ -63,6 +63,18 @@
 
 ## 5. 🏗️ Build Log & Milestones
 
+### Milestone 1: Database Schema, Indexes & RLS Migrations
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Initialized Supabase configuration (`supabase/config.toml`).
+  - Created initial migration `supabase/migrations/20260905180000_sponsorflow_initial_schema.sql` and single-file SQL reference `supabase/schema.sql`.
+  - Defined all 17 core tables (`users`, `user_sessions`, `user_profiles`, `user_industries`, `user_skills`, `user_projects`, `user_documents`, `company_imports`, `companies`, `contacts`, `outreach_emails`, `email_events`, `email_replies`, `send_limits`, `gmail_tokens`, `analytics_daily`, `analytics_by_industry`).
+  - Implemented Row-Level Security (RLS) on all 17 tables to ensure multi-tenant user data isolation.
+  - Implemented utility functions (`normalize_company_name`, `email_hash`, `handle_updated_at`) and normalization triggers.
+  - Created strict TypeScript interface definitions in `types/database.ts`.
+  - Configured environment variable templates (`.env.example`, `.env.local`).
+
 ### Milestone 0: Workspace Setup & Repository Sync
 - **Date**: 2026-09-05
 - **Status**: Completed
@@ -71,3 +83,4 @@
   - Loaded `gstack` agent skill suite.
   - Verified and cataloged all design and implementation specs (`SPONSORFLOW-DESIGN.md`, `PROMPT-PACK-SPONSORFLOW-PHASE-1.md`, `shopifydesignskills.md`, `SPONSORFLOW-QUICK-START.md`).
   - Created live trackers: `PROCESS.md` and `BUG.md`.
+
