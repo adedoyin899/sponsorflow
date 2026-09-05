@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ApprovalModal, EmailDetail } from "@/components/emails/ApprovalModal";
 import { GmailConnectBanner } from "@/components/emails/GmailConnectBanner";
+import { RateLimitWidget } from "@/components/emails/RateLimitWidget";
 import {
   Mail,
   Sparkles,
@@ -141,6 +142,9 @@ export default function PendingEmailsPage() {
           <Badge variant="outline">All Outreach</Badge>
         </Card>
       </div>
+
+      {/* Rate Limits & Batch Send Action */}
+      <RateLimitWidget onDispatched={fetchEmails} readyCount={approvedEmails.length} />
 
       {/* Search & Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

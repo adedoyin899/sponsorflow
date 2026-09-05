@@ -808,4 +808,165 @@ export async function updateEmailStatus(
   return data;
 }
 
+// ==============================================================================
+// RATE LIMITING & DISPATCH WORKFLOW
+// ==============================================================================
+
+export async function getAndResetSendLimits(userId: string): Promise<SendLimitsRow> {
+  const supabase = createServerSupabaseClient();
+  const now = new Date();
+  const todayDate = now.toISOString().split("T")[0];
+  const currentHour = now.getUTCHours();
+
+  let { data: limits } = await (supabase
+    .from("send_limits")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle() as unknown as Promise<{ data: SendLimitsRow | null }>);
+
+  // Auto-create if not present
+  if (!limits) {
+    const { data: created } = await (supabase
+      .from("send_limits")
+      .insert({
+        user_id: userId,
+        daily_limit: 20,
+        hourly_limit: 5,
+        emails_sent_today: 0,
+        emails_sent_this_hour: 0,
+        last_reset_date: todayDate,
+        last_reset_hour: currentHour,
+      })
+      .select()
+      .single() as unknown as Promise<{ data: SendLimitsRow | null }>);
+    return created!;
+  }
+
+  // Check resets
+  const needsDailyReset = limits.last_reset_date !== todayDate;
+  const needsHourlyReset = limits.last_reset_hour !== currentHour || needsDailyReset;
+
+  if (needsDailyReset || needsHourlyReset) {
+    const updates: Record<string, unknown> = {
+      updated_at: now.toISOString(),
+    };
+
+    if (needsDailyReset) {
+      updates.emails_sent_today = 0;
+      updates.last_reset_date = todayDate;
+    }
+
+    if (needsHourlyReset) {
+      updates.emails_sent_this_hour = 0;
+      updates.last_reset_hour = currentHour;
+    }
+
+    const { data: updated } = await (supabase
+      .from("send_limits")
+      .update(updates)
+      .eq("id", limits.id)
+      .select()
+      .single() as unknown as Promise<{ data: SendLimitsRow | null }>);
+
+    if (updated) limits = updated;
+  }
+
+  return limits;
+}
+
+export async function canSendEmail(userId: string): Promise<{
+  canSend: boolean;
+  reason?: string;
+  limits: SendLimitsRow;
+}> {
+  const limits = await getAndResetSendLimits(userId);
+
+  if (limits.emails_sent_today >= limits.daily_limit) {
+    return {
+      canSend: false,
+      reason: `Daily sending limit reached (${limits.emails_sent_today}/${limits.daily_limit}). More emails can be sent tomorrow.`,
+      limits,
+    };
+  }
+
+  if (limits.emails_sent_this_hour >= limits.hourly_limit) {
+    return {
+      canSend: false,
+      reason: `Hourly rate limit reached (${limits.emails_sent_this_hour}/${limits.hourly_limit}). Try again in the next hour to protect inbox deliverability.`,
+      limits,
+    };
+  }
+
+  return { canSend: true, limits };
+}
+
+export async function incrementSendCount(userId: string): Promise<SendLimitsRow> {
+  const supabase = createServerSupabaseClient();
+  const limits = await getAndResetSendLimits(userId);
+
+  const { data: updated, error } = await (supabase
+    .from("send_limits")
+    .update({
+      emails_sent_today: limits.emails_sent_today + 1,
+      emails_sent_this_hour: limits.emails_sent_this_hour + 1,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", limits.id)
+    .select()
+    .single() as unknown as Promise<{ data: SendLimitsRow | null; error: { message: string } | null }>);
+
+  if (error || !updated) {
+    throw new Error(error?.message || "Failed to increment send count");
+  }
+
+  return updated;
+}
+
+export async function recordEmailDispatched(
+  userId: string,
+  emailId: string,
+  gmailMessageId: string,
+  gmailThreadId: string
+): Promise<OutreachEmailRow> {
+  const supabase = createServerSupabaseClient();
+  const now = new Date().toISOString();
+
+  // 1. Update email record
+  const { data: email, error: emailErr } = await (supabase
+    .from("outreach_emails")
+    .update({
+      status: "sent",
+      sent_at: now,
+      delivery_status: "delivered",
+      gmail_message_id: gmailMessageId,
+      gmail_thread_id: gmailThreadId,
+      updated_at: now,
+    })
+    .eq("id", emailId)
+    .eq("user_id", userId)
+    .select()
+    .single() as unknown as Promise<{ data: OutreachEmailRow | null; error: { message: string } | null }>);
+
+  if (emailErr || !email) {
+    throw new Error(emailErr?.message || "Failed to record email dispatch");
+  }
+
+  // 2. Increment user's send limits
+  await incrementSendCount(userId);
+
+  // 3. Log event in email_events table
+  await supabase.from("email_events").insert({
+    outreach_email_id: emailId,
+    event_type: "sent",
+    event_data: {
+      gmail_message_id: gmailMessageId,
+      gmail_thread_id: gmailThreadId,
+    },
+    occurred_at: now,
+  });
+
+  return email;
+}
+
+
 
