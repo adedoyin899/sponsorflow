@@ -52,7 +52,7 @@
 [Prompt 5]  10-Step User Profile Onboarding           [Completed ✅]
 [Prompt 6]  CSV Import & Smart Deduplication          [Completed ✅]
 [Prompt 7]  Claude AI Email Generation Engine         [Completed ✅]
-[Prompt 8]  Email Review, Edit & Approval Workflow    [Pending]
+[Prompt 8]  Email Review, Edit & Approval Workflow    [Completed ✅]
 [Prompt 9]  Gmail OAuth Integration                   [Pending]
 [Prompt 10] Email Dispatcher & Rate Limiter           [Pending]
 [Prompt 11] Gmail Pub/Sub Webhook & AI Classifier     [Pending]
@@ -62,6 +62,25 @@
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 8: Human-in-the-Loop Email Review, Edit & Approval Workflow
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Implemented backend approval endpoints:
+    - `PUT /api/emails/:id` — Full edit persistence (subject, body, user edit audit) and status transitions (`draft` → `ready_to_send` / `approved`).
+    - `POST /api/emails/:id/reject` — Marks draft as `rejected` while preserving database history.
+  - Built interactive review modal in `components/emails/ApprovalModal.tsx`:
+    - Full screen backdrop with company and contact badges, positioning angle, and context hook.
+    - Inline edit mode with live word counter (target: 70–150 words).
+    - Regenerate button invoking Claude AI directly.
+    - Reject and "Approve & Queue" (`ready_to_send`) actions.
+  - Built review queue page in `app/(dashboard)/emails/pending/page.tsx`:
+    - Tabbed view: Pending Review (`draft`), Approved (`ready_to_send`), and All.
+    - Real-time search by company name, recipient, or subject.
+    - One-click review modal trigger.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (43/43 routes ✅).
+
 
 ### Milestone 7: Claude AI Cold Outreach Personalization Engine
 - **Date**: 2026-09-05
