@@ -1,28 +1,38 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { signupUser } from "@/lib/auth";
+
+const signupSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  passwordConfirm: z.string().min(8, "Password must be at least 8 characters"),
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "Passwords do not match",
+  path: ["passwordConfirm"],
+});
 
 export async function POST(req: Request) {
   try {
-    const { email, password, passwordConfirm } = await req.json();
+    const body = await req.json();
+    const result = signupSchema.safeParse(body);
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+    if (!result.success) {
+      const errorMessage = result.error.errors[0]?.message || "Validation failed";
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
-    if (password !== passwordConfirm) {
-      return NextResponse.json({ error: "Passwords do not match" }, { status: 400 });
-    }
+    const { email, password } = result.data;
+    const user = await signupUser(email, password);
 
-    if (password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
-    }
-
-    // Return success
     return NextResponse.json({
       success: true,
-      message: "Account created. Verification email sent.",
-      user_id: "demo-user-id",
+      message: "Account created successfully. Verification email sent.",
+      user_id: user.id,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to process signup" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to create account" },
+      { status: 400 }
+    );
   }
 }

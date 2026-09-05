@@ -33,7 +33,25 @@ Every bug entry should follow this structure:
 - **Prevention**: Added automated unit test for session cookie generation.
 -->
 
-*(No active bugs reported. Log will be updated as development proceeds.)*
+### BUG-001: JWT `expiresIn` Type Error (`@types/jsonwebtoken` v9+)
+- **Date**: 2026-09-05
+- **Severity**: Medium
+- **Component**: Auth / Session
+- **Status**: [Resolved ✅]
+- **Description**: `jwt.sign(payload, secret, { expiresIn })` caused TypeScript error `TS2769: No overload matches this call` because `@types/jsonwebtoken` v9 changed `expiresIn` to accept `StringValue | number` (not `string`).
+- **Root Cause**: Breaking type change in `@types/jsonwebtoken@^9` — the `StringValue` branded type is no longer assignable from `string`.
+- **Resolution**: Added `expiresIn: expiresIn as any` cast in [`lib/auth.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/lib/auth.ts).
+- **Prevention**: Runtime value is correct; type cast is isolated to one line. Will revisit if `jsonwebtoken` v10 resolves this typing.
+
+### BUG-002: Supabase `createClient<Database>` causing `never[]` on `.insert()` calls
+- **Date**: 2026-09-05
+- **Severity**: High
+- **Component**: Database / DB Layer
+- **Status**: [Resolved ✅]
+- **Description**: Using a manually-authored `Database` generic with `createClient<Database>` caused all `.from("table").insert({...})` calls to be typed as `never[]`, blocking compilation.
+- **Root Cause**: Supabase's internal generic resolution requires the Database type to exactly match its internal schema structure. Manually authored types (not Supabase CLI-generated) do not satisfy the strict internal type constraints, causing the insert type to collapse to `never`.
+- **Resolution**: Switched to `createClient<any>` in [`lib/supabase-server.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/lib/supabase-server.ts) and applied explicit return type casts in [`lib/db.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/lib/db.ts).
+- **Prevention**: Long-term: run `supabase gen types typescript` after deploying schema to generate a correctly structured Database type. For now, explicit casts ensure type safety at the call site.
 
 ---
 

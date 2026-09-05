@@ -1,7 +1,12 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Card } from "@/components/ui/card";
+
+export const metadata = {
+  title: "Log In — SponsorFlow",
+  description: "Sign in to your SponsorFlow account to manage your outreach campaigns.",
+};
 
 export default function LoginPage() {
   return (
@@ -24,7 +29,10 @@ export default function LoginPage() {
         </div>
 
         <Card variant="glass" className="p-8">
-          <LoginForm />
+          {/* LoginForm uses useSearchParams — must be wrapped in Suspense */}
+          <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-neutral-900" />}>
+            <LoginForm />
+          </Suspense>
         </Card>
 
         <p className="text-center text-xs text-neutral-500">

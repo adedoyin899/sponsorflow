@@ -1,28 +1,57 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight } from "lucide-react";
 
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const [serverError, setServerError] = useState<string | null>(
+    searchParams.get("error") || null
+  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+  // Clear error from URL after displaying it
+  useEffect(() => {
+    if (searchParams.get("error")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [searchParams]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: LoginFormData) => {
+    setServerError(null);
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -34,44 +63,47 @@ export function LoginForm() {
       router.push("/dashboard");
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Invalid credentials");
-    } finally {
-      setIsLoading(false);
+      setServerError(err.message || "Invalid email or password");
     }
   };
 
   const handleGoogleLogin = () => {
+    // Redirect to our initiation route which builds the CSRF-safe OAuth URL
     window.location.href = "/api/auth/google";
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {serverError && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-          {error}
+          {serverError}
         </div>
       )}
 
       <Input
         label="Email Address"
         type="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
+        placeholder="doyin@example.com"
+        error={errors.email?.message}
+        {...register("email")}
       />
 
       <Input
         label="Password"
         type="password"
         placeholder="••••••••"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
+        error={errors.password?.message}
+        {...register("password")}
       />
 
-      <Button type="submit" variant="aloe" size="lg" className="w-full mt-2" isLoading={isLoading}>
-        Log In to Dashboard <ArrowRight className="w-4 h-4 ml-1" />
+      <Button
+        type="submit"
+        variant="aloe"
+        size="lg"
+        className="w-full mt-2"
+        isLoading={isSubmitting}
+      >
+        Log In to Dashboard <ArrowRight className="w-4 h-4 ml-1.5" />
       </Button>
 
       <div className="relative my-6 text-center">

@@ -1,7 +1,12 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { Card } from "@/components/ui/card";
+
+export const metadata = {
+  title: "Create Account — SponsorFlow",
+  description: "Set up your SponsorFlow account and start your UK sponsor job acquisition campaign.",
+};
 
 export default function SignupPage() {
   return (
@@ -24,7 +29,10 @@ export default function SignupPage() {
         </div>
 
         <Card variant="glass" className="p-8">
-          <SignupForm />
+          {/* SignupForm uses useSearchParams — must be wrapped in Suspense */}
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-xl bg-neutral-900" />}>
+            <SignupForm />
+          </Suspense>
         </Card>
 
         <p className="text-center text-xs text-neutral-500">

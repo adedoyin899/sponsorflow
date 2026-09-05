@@ -47,8 +47,8 @@
 ```
 [Prompt 1]  Database Schema & RLS Migrations          [Completed ✅]
 [Prompt 2]  Next.js 14 Setup + Tailwind Design System [Completed ✅]
-[Prompt 3]  Email/Password Auth + Session Guard       [Pending]
-[Prompt 4]  Google OAuth 2.0 Authentication           [Pending]
+[Prompt 3]  Email/Password Auth + Session Guard       [Completed ✅]
+[Prompt 4]  Google OAuth 2.0 Authentication           [Completed ✅]
 [Prompt 5]  10-Step User Profile Onboarding           [Pending]
 [Prompt 6]  CSV Import & Smart Deduplication          [Pending]
 [Prompt 7]  Claude AI Email Generation Engine         [Pending]
@@ -62,6 +62,35 @@
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 4: Google OAuth 2.0 Authentication
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Created `lib/google-oauth.ts` — `buildGoogleOAuthUrl()`, `exchangeGoogleCode()`, `getGoogleProfile()`, `generateOAuthState()` using Google REST APIs directly.
+  - Created `app/api/auth/google/route.ts` — CSRF-safe OAuth initiation: generates state nonce, stores in HTTP-only cookie, redirects to Google consent screen.
+  - Replaced stub `app/api/auth/google-callback/route.ts` with full implementation: validates CSRF state, exchanges code for tokens, fetches Google profile, calls `getOrCreateGoogleUser()`, generates JWT, sets session cookie, redirects new users to `/onboarding` and returning users to `/dashboard`.
+  - Added `getOrCreateGoogleUser()` to `lib/db.ts` — 3-step resolution: lookup by `google_id` → lookup by email (auto-links existing accounts) → create new user.
+  - Updated `LoginForm.tsx` and `SignupForm.tsx` to read `?error=` query param from OAuth redirects and display gracefully.
+  - Wrapped both auth forms in `<Suspense>` on their respective pages (required by `useSearchParams`).
+  - Created `app/onboarding/page.tsx` — stub landing for new Google users (full wizard in Prompt 5).
+  - Updated `middleware.ts` to protect `/onboarding/*`.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (22/22 routes ✅).
+
+### Milestone 3: Email/Password Auth + Session Guard
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Implemented `/api/auth/signup` — bcrypt password hash, Zod validation, user+profile+send_limits auto-init.
+  - Implemented `/api/auth/login` — bcrypt compare, JWT generation (7d), secure HTTP-only `sponsorflow_session` cookie.
+  - Implemented `/api/auth/logout` — clears cookie and deletes session from `user_sessions` table.
+  - Implemented `/api/auth/me` — reads JWT from cookie or Bearer header, returns user + profile.
+  - Built `SignupForm.tsx` and `LoginForm.tsx` with React Hook Form + Zod validation.
+  - Built `/signup` and `/login` pages with glassmorphic card layout and ambient glow effect.
+  - Built `/google-callback` page (stub — full OAuth wired in Prompt 4).
+  - Implemented `middleware.ts` — protects all `/dashboard/*`, `/profile/*`, `/companies/*`, `/emails/*`, `/analytics/*`, `/onboarding/*` routes; redirects logged-in users away from auth pages.
+  - Fixed TypeScript compile errors: JWT `expiresIn` type cast and Supabase `createClient<any>` to avoid `never[]` inference on manually authored Database types.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (20/20 routes ✅).
 
 ### Milestone 2: Next.js 14 Setup, Tailwind & Design System Tokens
 - **Date**: 2026-09-05

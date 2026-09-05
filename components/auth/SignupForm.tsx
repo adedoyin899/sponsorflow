@@ -1,40 +1,66 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+
+const signupSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters long"),
+    passwordConfirm: z.string().min(8, "Confirm password is required"),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: "Passwords do not match",
+    path: ["passwordConfirm"],
+  });
+
+type SignupFormData = z.infer<typeof signupSchema>;
 
 export function SignupForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const [serverError, setServerError] = useState<string | null>(
+    searchParams.get("error") || null
+  );
   const [isSuccess, setIsSuccess] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+  // Clear error from URL after displaying it
+  useEffect(() => {
+    if (searchParams.get("error")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
     }
+  }, [searchParams]);
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    },
+  });
 
-    setIsLoading(true);
+  const onSubmit = async (values: SignupFormData) => {
+    setServerError(null);
 
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, passwordConfirm: confirmPassword }),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -43,15 +69,15 @@ export function SignupForm() {
         throw new Error(data.error || "Failed to create account");
       }
 
+      setUserEmail(values.email);
       setIsSuccess(true);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
+      setServerError(err.message || "An unexpected error occurred");
     }
   };
 
   const handleGoogleSignup = () => {
+    // Redirect to our initiation route which builds the CSRF-safe OAuth URL
     window.location.href = "/api/auth/google";
   };
 
@@ -59,16 +85,17 @@ export function SignupForm() {
     return (
       <div className="text-center py-6 space-y-4">
         <div className="w-12 h-12 bg-brand-aloe/20 text-brand-aloe rounded-full flex items-center justify-center mx-auto mb-2">
-          <Sparkles className="w-6 h-6" />
+          <CheckCircle2 className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-semibold text-white">Check your inbox</h3>
-        <p className="text-sm text-neutral-400 max-w-sm mx-auto">
-          We sent a verification link to <span className="text-white font-medium">{email}</span>. Click the link in your email to activate your account.
+        <h3 className="text-xl font-semibold text-white">Check your email</h3>
+        <p className="text-xs text-neutral-400 max-w-sm mx-auto leading-relaxed">
+          We sent a verification link to <span className="text-white font-medium">{userEmail}</span>.
+          Click the link to verify your email and begin onboarding.
         </p>
         <div className="pt-4">
           <Link href="/login">
-            <Button variant="secondary" size="md">
-              Return to Login
+            <Button variant="aloe" size="md">
+              Proceed to Sign In <ArrowRight className="w-4 h-4 ml-1.5" />
             </Button>
           </Link>
         </div>
@@ -77,42 +104,45 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {serverError && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-          {error}
+          {serverError}
         </div>
       )}
 
       <Input
         label="Work or Personal Email"
         type="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
+        placeholder="doyin@example.com"
+        error={errors.email?.message}
+        {...register("email")}
       />
 
       <Input
         label="Password"
         type="password"
         placeholder="Min 8 characters"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
+        error={errors.password?.message}
+        {...register("password")}
       />
 
       <Input
         label="Confirm Password"
         type="password"
         placeholder="Re-enter password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        required
+        error={errors.passwordConfirm?.message}
+        {...register("passwordConfirm")}
       />
 
-      <Button type="submit" variant="aloe" size="lg" className="w-full mt-2" isLoading={isLoading}>
-        Create Free Account <ArrowRight className="w-4 h-4 ml-1" />
+      <Button
+        type="submit"
+        variant="aloe"
+        size="lg"
+        className="w-full mt-2"
+        isLoading={isSubmitting}
+      >
+        Create Account <ArrowRight className="w-4 h-4 ml-1.5" />
       </Button>
 
       <div className="relative my-6 text-center">
