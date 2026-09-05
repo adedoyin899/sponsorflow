@@ -50,7 +50,7 @@
 [Prompt 3]  Email/Password Auth + Session Guard       [Completed ✅]
 [Prompt 4]  Google OAuth 2.0 Authentication           [Completed ✅]
 [Prompt 5]  10-Step User Profile Onboarding           [Completed ✅]
-[Prompt 6]  CSV Import & Smart Deduplication          [Pending]
+[Prompt 6]  CSV Import & Smart Deduplication          [Completed ✅]
 [Prompt 7]  Claude AI Email Generation Engine         [Pending]
 [Prompt 8]  Email Review, Edit & Approval Workflow    [Pending]
 [Prompt 9]  Gmail OAuth Integration                   [Pending]
@@ -62,6 +62,23 @@
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 6: Flexible CSV Import & Smart Deduplication Engine
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Implemented `lib/csv-parser.ts` with fuzzy/flexible column auto-detection (Company Name, Website, Career Page, Industry, Sponsor Rating, Personalization Hook, Contacts) and fallback industry inference.
+  - Implemented company database operations in `lib/db.ts`: `normalizeCompanyName()`, `checkDuplicateCompanies()`, `importCompanies()`, and `getCompaniesForUser()`.
+  - Built API endpoints:
+    - `POST /api/companies/preview` — Parses uploaded CSV/text and runs duplicate checks against user's existing database records.
+    - `POST /api/companies/import` — Executes import with `skip`, `replace`, or `merge` resolution strategies, tracking metrics in `company_imports`.
+    - `GET /api/companies/sample` — Delivers pre-formatted CSV with 54 curated UK tech sponsors and Worker license ratings.
+    - `GET /api/companies` — User company directory with search and industry filtering.
+  - Built interactive frontend:
+    - `app/(dashboard)/companies/import/page.tsx` — Drag-and-drop file upload, instant preview table, duplicate/new pill counts, duplicate strategy radio cards, campaign tags, and sample data loader.
+    - `app/(dashboard)/companies/page.tsx` — Dynamic company directory with live search, industry category filters, and quick action buttons.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (40/40 routes ✅).
+
 
 ### Milestone 5: 10-Step User Profile Onboarding & DOCX Positioning Template
 - **Date**: 2026-09-05

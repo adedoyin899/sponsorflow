@@ -410,3 +410,245 @@ export async function getUserByIdWithProfile(userId: string) {
   const profile = await getFullProfile(userId);
   return { user, profile };
 }
+
+// ==============================================================================
+// COMPANIES & IMPORT PIPELINE
+// ==============================================================================
+
+type CompanyRow = Database["public"]["Tables"]["companies"]["Row"];
+type CompanyImportRow = Database["public"]["Tables"]["company_imports"]["Row"];
+
+/**
+ * Normalizes company names to match database normalization logic
+ */
+export function normalizeCompanyName(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+(ltd|limited|plc|inc|incorporated|llc|corp|corporation)$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Check for duplicate companies for a user by normalized company name
+ */
+export async function checkDuplicateCompanies(
+  userId: string,
+  companyNames: string[]
+): Promise<Map<string, CompanyRow>> {
+  const supabase = createServerSupabaseClient();
+  const normalizedList = Array.from(new Set(companyNames.map(normalizeCompanyName))).filter(Boolean);
+
+  if (normalizedList.length === 0) return new Map();
+
+  const { data: existing } = await (supabase
+    .from("companies")
+    .select("*")
+    .eq("user_id", userId)
+    .in("normalized_name", normalizedList) as unknown as Promise<{ data: CompanyRow[] | null }>);
+
+  const map = new Map<string, CompanyRow>();
+  if (existing) {
+    for (const comp of existing) {
+      map.set(comp.normalized_name, comp);
+    }
+  }
+
+  return map;
+}
+
+export interface ImportCompaniesOptions {
+  fileName: string;
+  fileSize?: number;
+  campaignTag?: string;
+  duplicateResolution: "skip" | "replace" | "merge";
+}
+
+export interface ImportCompaniesResult {
+  importId: string;
+  totalFound: number;
+  importedCount: number;
+  duplicatesCount: number;
+  duplicateList: Array<{ company_name: string; resolution: string }>;
+}
+
+export async function importCompanies(
+  userId: string,
+  companies: Array<{
+    company_name: string;
+    website?: string | null;
+    career_page?: string | null;
+    industry?: string | null;
+    location?: string | null;
+    sponsor_rating?: string | null;
+    personalization_hook?: string | null;
+    contact_name?: string | null;
+    contact_email?: string | null;
+    contact_role?: string | null;
+  }>,
+  options: ImportCompaniesOptions
+): Promise<ImportCompaniesResult> {
+  const supabase = createServerSupabaseClient();
+
+  // 1. Create company_imports tracking record
+  const { data: importRecord, error: importErr } = await supabase
+    .from("company_imports")
+    .insert({
+      user_id: userId,
+      file_name: options.fileName,
+      file_size: options.fileSize || null,
+      campaign_tag: options.campaignTag || null,
+      companies_found: companies.length,
+      companies_duplicates: 0,
+      companies_imported: 0,
+      status: "processing",
+    })
+    .select()
+    .single() as unknown as { data: CompanyImportRow | null; error: { message: string } | null };
+
+  if (importErr || !importRecord) {
+    throw new Error(importErr?.message || "Failed to create import record");
+  }
+
+  const importId = importRecord.id;
+
+  // 2. Lookup existing companies for this user to check duplicates
+  const names = companies.map((c) => c.company_name);
+  const existingMap = await checkDuplicateCompanies(userId, names);
+
+  const duplicateList: Array<{ company_name: string; resolution: string }> = [];
+  const toInsert: Array<Record<string, unknown>> = [];
+  const contactsToInsert: Array<Record<string, unknown>> = [];
+  let importedCount = 0;
+
+  for (const item of companies) {
+    const norm = normalizeCompanyName(item.company_name);
+    const existing = existingMap.get(norm);
+
+    if (existing) {
+      duplicateList.push({
+        company_name: item.company_name,
+        resolution: options.duplicateResolution,
+      });
+
+      if (options.duplicateResolution === "skip") {
+        // Skip duplicate
+        continue;
+      }
+
+      if (options.duplicateResolution === "replace") {
+        // Update existing record
+        await supabase
+          .from("companies")
+          .update({
+            website: item.website || existing.website,
+            career_page: item.career_page || existing.career_page,
+            industry: item.industry || existing.industry,
+            location: item.location || existing.location,
+            sponsor_rating: item.sponsor_rating || existing.sponsor_rating,
+            personalization_hook: item.personalization_hook || existing.personalization_hook,
+            campaign_tag: options.campaignTag || existing.campaign_tag,
+            import_id: importId,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+
+        importedCount++;
+        continue;
+      }
+
+      // If "merge", insert with new unique suffix or allow duplicate
+    }
+
+    // New company or merge mode
+    const newCompanyId = crypto.randomUUID();
+    toInsert.push({
+      id: newCompanyId,
+      user_id: userId,
+      company_name: item.company_name.trim(),
+      normalized_name: norm,
+      website: item.website || null,
+      career_page: item.career_page || null,
+      industry: item.industry || null,
+      location: item.location || null,
+      sponsor_rating: item.sponsor_rating || "Worker (A rating)",
+      personalization_hook: item.personalization_hook || null,
+      import_id: importId,
+      campaign_tag: options.campaignTag || null,
+      status: "new",
+    });
+
+    if (item.contact_name || item.contact_email) {
+      contactsToInsert.push({
+        user_id: userId,
+        company_id: newCompanyId,
+        full_name: item.contact_name || "Hiring Manager",
+        email: item.contact_email || null,
+        job_title: item.contact_role || "Engineering Lead",
+      });
+    }
+  }
+
+  // 3. Batch insert new companies
+  if (toInsert.length > 0) {
+    const { error: batchErr } = await supabase.from("companies").insert(toInsert);
+    if (batchErr) {
+      await supabase
+        .from("company_imports")
+        .update({ status: "failed", error_message: batchErr.message })
+        .eq("id", importId);
+      throw new Error(`Failed to insert companies: ${batchErr.message}`);
+    }
+    importedCount += toInsert.length;
+  }
+
+  // Batch insert contacts if present in CSV
+  if (contactsToInsert.length > 0) {
+    await supabase.from("contacts").insert(contactsToInsert);
+  }
+
+  // 4. Update import status
+  await supabase
+    .from("company_imports")
+    .update({
+      companies_imported: importedCount,
+      companies_duplicates: duplicateList.length,
+      status: "completed",
+      completed_at: new Date().toISOString(),
+    })
+    .eq("id", importId);
+
+  return {
+    importId,
+    totalFound: companies.length,
+    importedCount,
+    duplicatesCount: duplicateList.length,
+    duplicateList,
+  };
+}
+
+export async function getCompaniesForUser(
+  userId: string,
+  filter?: { industry?: string; search?: string }
+): Promise<CompanyRow[]> {
+  const supabase = createServerSupabaseClient();
+  let query = supabase
+    .from("companies")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (filter?.industry && filter.industry !== "All") {
+    query = query.ilike("industry", `%${filter.industry}%`);
+  }
+
+  if (filter?.search) {
+    query = query.or(`company_name.ilike.%${filter.search}%,industry.ilike.%${filter.search}%,personalization_hook.ilike.%${filter.search}%`);
+  }
+
+  const { data } = await query as unknown as { data: CompanyRow[] | null };
+  return data || [];
+}
+
