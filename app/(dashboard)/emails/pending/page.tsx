@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ApprovalModal, EmailDetail } from "@/components/emails/ApprovalModal";
+import { GmailConnectBanner } from "@/components/emails/GmailConnectBanner";
 import {
   Mail,
   Sparkles,
@@ -103,6 +104,8 @@ export default function PendingEmailsPage() {
           </Link>
         </div>
       </div>
+
+      <GmailConnectBanner />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

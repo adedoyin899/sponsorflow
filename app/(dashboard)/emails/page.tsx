@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { EmailGenerator } from "@/components/emails/EmailGenerator";
 import { EmailApprovalUI } from "@/components/emails/EmailApprovalUI";
+import { GmailConnectBanner } from "@/components/emails/GmailConnectBanner";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, Send, CheckCircle2, Building2, UploadCloud } from "lucide-react";
 
@@ -40,6 +41,9 @@ export default function EmailsDashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Gmail Connection Status */}
+      <GmailConnectBanner />
 
       {/* Main Grid: Interactive Generator + Review Queue */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

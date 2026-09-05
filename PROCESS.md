@@ -53,7 +53,7 @@
 [Prompt 6]  CSV Import & Smart Deduplication          [Completed ✅]
 [Prompt 7]  Claude AI Email Generation Engine         [Completed ✅]
 [Prompt 8]  Email Review, Edit & Approval Workflow    [Completed ✅]
-[Prompt 9]  Gmail OAuth Integration                   [Pending]
+[Prompt 9]  Gmail OAuth Integration                   [Completed ✅]
 [Prompt 10] Email Dispatcher & Rate Limiter           [Pending]
 [Prompt 11] Gmail Pub/Sub Webhook & AI Classifier     [Pending]
 [Prompt 12] Outreach Pipeline & Analytics Dashboard   [Pending]
@@ -62,6 +62,26 @@
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 9: Gmail OAuth Integration & Direct Inbox Connection
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Implemented `lib/gmail.ts`:
+    - Full Google OAuth authorization builder for sending (`gmail.send`) and inbox reading (`gmail.readonly`) scopes.
+    - Automatic token persistence and silent token refreshing via `refresh_token` when nearing expiry.
+    - RFC 2822 base64url message encoder.
+    - Direct Gmail REST API message dispatcher (`/gmail/v1/users/me/messages/send`) with development fallback.
+  - Built Gmail API route handlers:
+    - `GET /api/gmail/connect` — Initiates OAuth flow with CSRF state nonce.
+    - `GET /api/gmail/callback` — Validates state, exchanges code for tokens, retrieves user's Gmail address, saves in `gmail_tokens`, and redirects with confirmation.
+    - `GET /api/gmail/status` — Returns integration status and active Gmail account.
+    - `POST /api/gmail/disconnect` — Cleans up stored credentials.
+  - Built UI components:
+    - Created `components/emails/GmailConnectBanner.tsx` showing real-time connection status, linked Gmail address, and connect/disconnect controls.
+    - Embedded banner across outreach dashboard and pending approval queues.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (47/47 routes ✅).
+
 
 ### Milestone 8: Human-in-the-Loop Email Review, Edit & Approval Workflow
 - **Date**: 2026-09-05
