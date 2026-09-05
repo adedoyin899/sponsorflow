@@ -46,7 +46,7 @@
 
 ```
 [Prompt 1]  Database Schema & RLS Migrations          [Completed ✅]
-[Prompt 2]  Next.js 14 Setup + Tailwind Design System [Pending]
+[Prompt 2]  Next.js 14 Setup + Tailwind Design System [Completed ✅]
 [Prompt 3]  Email/Password Auth + Session Guard       [Pending]
 [Prompt 4]  Google OAuth 2.0 Authentication           [Pending]
 [Prompt 5]  10-Step User Profile Onboarding           [Pending]
@@ -62,6 +62,20 @@
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 2: Next.js 14 Setup, Tailwind & Design System Tokens
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Scaffolded Next.js 14 (App Router) with TypeScript strict mode, Tailwind CSS, PostCSS, and `@/*` alias.
+  - Configured Shopify-inspired design tokens in `tailwind.config.ts` and `app/globals.css` (canvas night, cream mint, aloe & pistachio accents, pill buttons, and glassmorphic panels).
+  - Built core reusable UI primitives: `Button`, `Input`, `Card`, `Badge`.
+  - Built navigation and layout structures: `Header`, `Sidebar`, `DashboardStats`.
+  - Built email review & generation UI components: `EmailGenerator`, `EmailApprovalUI`.
+  - Created marketing landing page (`app/page.tsx`) and auth pages (`/signup`, `/login`, `/google-callback`).
+  - Created dashboard views (`/dashboard`, `/profile`, `/companies`, `/emails`, `/analytics`).
+  - Implemented modular API route handlers (`/api/auth/*`, `/api/profile`, `/api/companies`, `/api/emails`, `/api/analytics`).
+  - Verified with `npx tsc --noEmit` (0 errors) and `npm run build` (19/19 routes passed).
 
 ### Milestone 1: Database Schema, Indexes & RLS Migrations
 - **Date**: 2026-09-05
