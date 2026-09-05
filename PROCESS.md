@@ -49,7 +49,7 @@
 [Prompt 2]  Next.js 14 Setup + Tailwind Design System [Completed ✅]
 [Prompt 3]  Email/Password Auth + Session Guard       [Completed ✅]
 [Prompt 4]  Google OAuth 2.0 Authentication           [Completed ✅]
-[Prompt 5]  10-Step User Profile Onboarding           [Pending]
+[Prompt 5]  10-Step User Profile Onboarding           [Completed ✅]
 [Prompt 6]  CSV Import & Smart Deduplication          [Pending]
 [Prompt 7]  Claude AI Email Generation Engine         [Pending]
 [Prompt 8]  Email Review, Edit & Approval Workflow    [Pending]
@@ -62,6 +62,32 @@
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 5: 10-Step User Profile Onboarding & DOCX Positioning Template
+- **Date**: 2026-09-05
+- **Status**: Completed ✅
+- **Details**:
+  - Implemented modular profile API endpoints:
+    - `PUT /api/profile` — Full profile updates (demographics, visa requirement, target salary, story, tones).
+    - `POST /api/profile/industries` — Industry positioning models for targeted verticals.
+    - `POST /api/profile/skills` — Multi-category skill management (design, tools, domain).
+    - `POST /api/profile/projects` — Dynamic project case study management with metrics and impact.
+    - `GET /api/profile/template` — Generates and downloads standard `Personalization_Template.docx` via `docx` library.
+  - Implemented full client state management in `components/onboarding/OnboardingContext.tsx` with auto-save feedback ("Saving..." / "✓ Saved").
+  - Built high-contrast, responsive shell in `components/onboarding/OnboardingLayout.tsx` with progress bar, step pills, and Back/Next controls.
+  - Built all 10 wizard step pages:
+    - `step-1`: Welcome & pipeline explanation.
+    - `step-2`: Basic info (name, location, years experience, target job title, URLs).
+    - `step-3`: Professional background & target industry checkboxes.
+    - `step-4`: Design skills, tools, and custom skill chips.
+    - `step-5`: Dynamic project portfolio cards (1-6 projects).
+    - `step-6`: Sponsorship requirements (UK Skilled Worker, target salary, availability, remote pref).
+    - `step-7`: Fintech positioning textareas + DOCX template download.
+    - `step-8`: Healthcare positioning textareas + DOCX template download.
+    - `step-9`: Professional story, unique personal differentiator, and Claude writing voice selector (Direct / Warm / Formal).
+    - `step-10`: Interactive summary review cards with final submission, setting `profile_complete_percent: 100` and `onboarding_complete: true`, redirecting to `/dashboard`.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (36/36 routes ✅).
+
 
 ### Milestone 4: Google OAuth 2.0 Authentication
 - **Date**: 2026-09-05

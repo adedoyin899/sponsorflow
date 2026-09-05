@@ -226,3 +226,187 @@ export async function getOrCreateGoogleUser(profile: {
 
   return { user: newUser, isNew: true };
 }
+
+// ==============================================================================
+// PROFILE & ONBOARDING
+// ==============================================================================
+
+type UserProfileRow = Database["public"]["Tables"]["user_profiles"]["Row"];
+type UserIndustryRow = Database["public"]["Tables"]["user_industries"]["Row"];
+type UserSkillRow = Database["public"]["Tables"]["user_skills"]["Row"];
+type UserProjectRow = Database["public"]["Tables"]["user_projects"]["Row"];
+
+export async function updateUserProfile(
+  userId: string,
+  data: Record<string, unknown>
+): Promise<UserProfileRow> {
+  const supabase = createServerSupabaseClient();
+
+  const { data: profile, error } = await supabase
+    .from("user_profiles")
+    .update({ ...data, updated_at: new Date().toISOString() })
+    .eq("user_id", userId)
+    .select()
+    .single() as { data: UserProfileRow | null; error: { message: string } | null };
+
+  if (error || !profile) {
+    throw new Error(error?.message || "Failed to update profile");
+  }
+  return profile;
+}
+
+export async function getFullProfile(userId: string) {
+  const supabase = createServerSupabaseClient();
+
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle() as { data: UserProfileRow | null };
+
+  if (!profile) return null;
+
+  const [industriesRes, skillsRes, projectsRes] = await Promise.all([
+    supabase.from("user_industries").select("*").eq("profile_id", profile.id) as unknown as Promise<{ data: UserIndustryRow[] | null }>,
+    supabase.from("user_skills").select("*").eq("profile_id", profile.id) as unknown as Promise<{ data: UserSkillRow[] | null }>,
+    supabase.from("user_projects").select("*").eq("profile_id", profile.id).order("year", { ascending: false }) as unknown as Promise<{ data: UserProjectRow[] | null }>,
+  ]);
+
+  return {
+    ...profile,
+    industries: industriesRes.data || [],
+    skills: skillsRes.data || [],
+    projects: projectsRes.data || [],
+  };
+}
+
+export async function upsertUserIndustries(
+  profileId: string,
+  industries: Array<{
+    industry: string;
+    years_experience?: number;
+    experience_description?: string | null;
+    problems_solved?: string | null;
+    motivation?: string | null;
+  }>
+): Promise<UserIndustryRow[]> {
+  const supabase = createServerSupabaseClient();
+
+  // Delete all existing industries for this profile, then re-insert
+  await supabase.from("user_industries").delete().eq("profile_id", profileId);
+
+  if (industries.length === 0) return [];
+
+  const rows = industries.map((ind) => ({
+    profile_id: profileId,
+    industry: ind.industry,
+    years_experience: ind.years_experience ?? 0,
+    experience_description: ind.experience_description ?? null,
+    problems_solved: ind.problems_solved ?? null,
+    motivation: ind.motivation ?? null,
+  }));
+
+  const { data, error } = await supabase
+    .from("user_industries")
+    .insert(rows)
+    .select() as { data: UserIndustryRow[] | null; error: { message: string } | null };
+
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+export async function replaceUserSkills(
+  profileId: string,
+  skills: Array<{ skill_name: string; skill_category: "design" | "tools" | "other" }>
+): Promise<UserSkillRow[]> {
+  const supabase = createServerSupabaseClient();
+
+  await supabase.from("user_skills").delete().eq("profile_id", profileId);
+
+  if (skills.length === 0) return [];
+
+  const rows = skills.map((s) => ({
+    profile_id: profileId,
+    skill_name: s.skill_name,
+    skill_category: s.skill_category,
+  }));
+
+  const { data, error } = await supabase
+    .from("user_skills")
+    .insert(rows)
+    .select() as { data: UserSkillRow[] | null; error: { message: string } | null };
+
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+export async function replaceUserProjects(
+  profileId: string,
+  projects: Array<{
+    project_name: string;
+    company_name?: string | null;
+    year?: number | null;
+    description?: string | null;
+    role?: string | null;
+    industry?: string | null;
+    impact?: string | null;
+  }>
+): Promise<UserProjectRow[]> {
+  const supabase = createServerSupabaseClient();
+
+  await supabase.from("user_projects").delete().eq("profile_id", profileId);
+
+  if (projects.length === 0) return [];
+
+  const rows = projects.map((p) => ({
+    profile_id: profileId,
+    project_name: p.project_name,
+    company_name: p.company_name ?? null,
+    year: p.year ?? null,
+    description: p.description ?? null,
+    role: p.role ?? null,
+    industry: p.industry ?? null,
+    impact: p.impact ?? null,
+  }));
+
+  const { data, error } = await supabase
+    .from("user_projects")
+    .insert(rows)
+    .select() as { data: UserProjectRow[] | null; error: { message: string } | null };
+
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+export async function getOnboardingProgress(userId: string): Promise<{
+  percent: number;
+  complete: boolean;
+  profile: UserProfileRow | null;
+}> {
+  const supabase = createServerSupabaseClient();
+
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle() as { data: UserProfileRow | null };
+
+  return {
+    percent: profile?.profile_complete_percent ?? 0,
+    complete: profile?.onboarding_complete ?? false,
+    profile,
+  };
+}
+
+export async function getUserByIdWithProfile(userId: string) {
+  const supabase = createServerSupabaseClient();
+  const { data: user } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .maybeSingle() as { data: UserRow | null };
+
+  if (!user) return null;
+  const profile = await getFullProfile(userId);
+  return { user, profile };
+}
