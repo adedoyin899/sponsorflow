@@ -4,12 +4,22 @@
 
 @layer base {
   :root {
-    --background: #000000;
-    --foreground: #ffffff;
+    --background: #fbfbf5;
+    --foreground: #0f172a;
     --canvas-cream: #fbfbf5;
+    --canvas-night: #000000;
+    --surface-card: #ffffff;
+    --border-color: rgba(0, 0, 0, 0.08);
     --aloe: #c1fbd4;
     --pistachio: #d4f9e0;
     --mint: #99b3ad;
+  }
+
+  .dark {
+    --background: #000000;
+    --foreground: #ffffff;
+    --surface-card: rgba(20, 20, 20, 0.7);
+    --border-color: rgba(255, 255, 255, 0.08);
   }
 
   body {
@@ -17,6 +27,7 @@
     color: var(--foreground);
     font-feature-settings: "ss01", "ss02", "ss03", "cv01", "cv02";
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
 
@@ -51,16 +62,90 @@
 
 /* Glassmorphism */
 .glass-panel {
-  background: rgba(10, 10, 10, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  transition: all 0.2s ease;
+}
+
+.dark .glass-panel {
+  background: rgba(10, 10, 10, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
 .glass-card {
-  background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.dark .glass-card {
+  background: rgba(20, 20, 20, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light .glass-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+/* Light Theme Overrides for Dashboard Surfaces */
+.light .dashboard-shell {
+  background-color: #fbfbf5 !important;
+  color: #0f172a !important;
+}
+
+.light .dashboard-header {
+  background-color: rgba(251, 251, 245, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+
+.light .dashboard-sidebar {
+  background-color: #f5f5ed !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .dashboard-main {
+  background-color: #fbfbf5 !important;
+}
+
+.light .dashboard-shell h1,
+.light .dashboard-shell h2,
+.light .dashboard-shell h3,
+.light .dashboard-shell .text-white {
+  color: #0f172a !important;
+}
+
+.light .dashboard-shell p,
+.light .dashboard-shell .text-neutral-400 {
+  color: #64748b !important;
+}
+
+.light .dashboard-shell .text-neutral-500 {
+  color: #94a3b8 !important;
+}
+
+.light .dashboard-shell .border-white\/5,
+.light .dashboard-shell .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .dashboard-shell .bg-neutral-900\/60,
+.light .dashboard-shell .bg-neutral-900,
+.light .dashboard-shell .bg-black\/40 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .dashboard-shell .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 /* Pill CTA Buttons */
@@ -69,15 +154,20 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #0f172a;
+  color: #ffffff;
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
 }
 
+.dark .btn-pill-primary {
+  background-color: #ffffff;
+  color: #000000;
+}
+
 .btn-pill-primary:hover {
-  background-color: #e4e4e7;
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 
@@ -86,15 +176,25 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
 }
 
+.dark .btn-pill-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 .btn-pill-secondary:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.dark .btn-pill-secondary:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.3);
 }
@@ -118,12 +218,24 @@
 
 /* Gradients */
 .gradient-text {
+  background: linear-gradient(135deg, #0f172a 0%, #64748b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .gradient-text {
   background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-mint-text {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .gradient-mint-text {
   background: linear-gradient(135deg, #c1fbd4 0%, #99b3ad 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
     "/emails",
     "/replies",
     "/analytics",
+    "/settings",
     "/onboarding",
   ];
 
@@ -42,6 +43,7 @@ export const config = {
     "/emails/:path*",
     "/replies/:path*",
     "/analytics/:path*",
+    "/settings/:path*",
     "/onboarding/:path*",
     "/login",
     "/signup",

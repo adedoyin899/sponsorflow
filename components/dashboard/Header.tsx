@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, LogOut, User, Bell } from "lucide-react";
+import { Sparkles, LogOut, User } from "lucide-react";
+import { NotificationPopover } from "./NotificationPopover";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Header({ userEmail }: { userEmail?: string }) {
   const [email, setEmail] = useState(userEmail || "");
@@ -29,7 +31,7 @@ export function Header({ userEmail }: { userEmail?: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-black/60 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 w-full border-b border-white/5 dashboard-header bg-black/60 dark:bg-black/60 backdrop-blur-xl transition-colors duration-200">
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Link href="/dashboard" className="flex items-center gap-2.5">
@@ -39,14 +41,16 @@ export function Header({ userEmail }: { userEmail?: string }) {
             <span className="font-semibold text-white tracking-tight">SponsorFlow</span>
           </Link>
           <span className="hidden md:inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-white/5 text-neutral-400 border border-white/5">
-            Phase 1 Engine
+            UK Sponsor Engine
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button className="text-neutral-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5">
-            <Bell className="w-4 h-4" />
-          </button>
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Theme Toggle (Light / Dark) */}
+          <ThemeToggle />
+
+          {/* Interactive Notifications */}
+          <NotificationPopover />
           
           <div className="flex items-center gap-3 pl-3 border-l border-white/10">
             <div className="hidden sm:flex flex-col text-right">

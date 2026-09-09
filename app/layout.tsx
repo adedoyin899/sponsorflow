@@ -29,15 +29,36 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} dark`}>
-      <body className="min-h-screen bg-black text-white antialiased selection:bg-brand-aloe selection:text-black">
-        {children}
+    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const storedTheme = localStorage.getItem('sponsorflow_theme');
+                const isDark = storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.classList.remove('light');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.classList.add('light');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-screen antialiased selection:bg-brand-aloe selection:text-black">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

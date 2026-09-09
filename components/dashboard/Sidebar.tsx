@@ -26,10 +26,11 @@ export function Sidebar() {
     { name: "Outreach & Drafts", href: "/dashboard/emails", icon: Mail },
     { name: "Inbound Replies", href: "/dashboard/replies", icon: MessageSquare },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
-    <aside className="w-64 border-r border-white/5 bg-black/40 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between">
+    <aside className="w-64 border-r border-white/5 dashboard-sidebar bg-black/40 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between transition-colors duration-200">
       <div className="space-y-6">
         <nav className="space-y-1">
           {navigation.map((item) => {
