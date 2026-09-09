@@ -86,7 +86,8 @@ export async function loginUser(email: string, password: string) {
   if (
     isPlaceholderDb ||
     normalizedEmail === "doyin@example.com" ||
-    normalizedEmail === "test@example.com"
+    normalizedEmail === "test@example.com" ||
+    normalizedEmail === "demo@sponsorflow.io"
   ) {
     const demoUser = {
       id: "00000000-0000-0000-0000-000000000001",

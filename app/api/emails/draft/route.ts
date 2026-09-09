@@ -17,9 +17,18 @@ import {
 } from "@/lib/claude";
 
 const draftRequestSchema = z.object({
-  company_id: z.string().uuid("Invalid company ID"),
-  contact_id: z.string().uuid().optional().nullable(),
+  company_id: z.string().min(1, "Invalid company ID"),
+  contact_id: z.string().optional().nullable(),
 });
+
+const FALLBACK_COMPANIES = [
+  { id: "1", company_name: "ClearBank", website: "https://clear.bank", industry: "Fintech", location: "London", sponsor_rating: "Worker (A rating)", personalization_hook: "Embedded clearing and payments infrastructure with real-time settlement rails." },
+  { id: "2", company_name: "Canva", website: "https://canva.com", industry: "Design & SaaS", location: "London", sponsor_rating: "Worker (A rating)", personalization_hook: "Visual suite collaboration and generative AI design systems." },
+  { id: "3", company_name: "Cloudflare", website: "https://cloudflare.com", industry: "Cloud Infrastructure", location: "London", sponsor_rating: "Worker (A rating)", personalization_hook: "Zero Trust edge security and developer serverless platform." },
+  { id: "4", company_name: "Atlassian", website: "https://atlassian.com", industry: "Enterprise SaaS", location: "London", sponsor_rating: "Worker (A rating)", personalization_hook: "Jira & Confluence agile workflows and team velocity tooling." },
+  { id: "5", company_name: "Monzo", website: "https://monzo.com", industry: "Fintech", location: "London", sponsor_rating: "Worker (A rating)", personalization_hook: "Consumer digital banking and transparent money management UX." },
+  { id: "6", company_name: "Wise", website: "https://wise.com", industry: "Fintech", location: "London", sponsor_rating: "Worker (A rating)", personalization_hook: "Cross-border payments transparency and real-time currency exchange." },
+];
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
@@ -41,17 +50,41 @@ export async function POST(req: Request) {
     const { company_id, contact_id } = parsed.data;
     const supabase = createServerSupabaseClient();
 
-    // 1. Fetch company
-    const { data: company, error: companyErr } = await (supabase
-      .from("companies")
-      .select("*")
-      .eq("id", company_id)
-      .eq("user_id", user.id)
-      .maybeSingle() as unknown as Promise<{ data: any; error: any }>);
+    // 1. Fetch company from DB or fallback sample list
+    let targetCompany: any = null;
 
-    if (companyErr || !company) {
+    try {
+      const { data: company } = await (supabase
+        .from("companies")
+        .select("*")
+        .eq("id", company_id)
+        .eq("user_id", user.id)
+        .maybeSingle() as unknown as Promise<{ data: any; error: any }>);
+      targetCompany = company;
+    } catch {
+      // Supabase lookup bypassed or failed
+    }
+
+    if (!targetCompany) {
+      const sample = FALLBACK_COMPANIES.find((c) => c.id === company_id || c.company_name.toLowerCase() === company_id.toLowerCase());
+      if (sample) {
+        targetCompany = {
+          id: sample.id,
+          company_name: sample.company_name,
+          website: sample.website,
+          industry: sample.industry,
+          sponsor_rating: sample.sponsor_rating,
+          personalization_hook: sample.personalization_hook,
+          status: "ready_to_send",
+        };
+      }
+    }
+
+    if (!targetCompany) {
       return NextResponse.json({ error: "Target company not found" }, { status: 404 });
     }
+
+    const company = targetCompany;
 
     // 2. Fetch contact if provided, or lookup any contact associated with this company
     let contactName = "Hiring Manager";

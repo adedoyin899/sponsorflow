@@ -11,7 +11,7 @@ import { sendGmailEmail } from "@/lib/gmail";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 const batchSendSchema = z.object({
-  email_ids: z.array(z.string().uuid()).optional(),
+  email_ids: z.array(z.string().min(1)).optional(),
 });
 
 export async function POST(req: Request) {

@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 }
 
 const manualReplySchema = z.object({
-  outreach_email_id: z.string().uuid().optional(),
+  outreach_email_id: z.string().min(1).optional(),
   from_email: z.string().email(),
   from_name: z.string().optional(),
   subject: z.string().optional(),

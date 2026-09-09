@@ -53,6 +53,36 @@ Every bug entry should follow this structure:
 - **Resolution**: Switched to `createClient<any>` in [`lib/supabase-server.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/lib/supabase-server.ts) and applied explicit return type casts in [`lib/db.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/lib/db.ts).
 - **Prevention**: Long-term: run `supabase gen types typescript` after deploying schema to generate a correctly structured Database type. For now, explicit casts ensure type safety at the call site.
 
+### BUG-003: Vercel Server File Trace Manifest Collision (`page_client-reference-manifest.js ENOENT`)
+- **Date**: 2026-09-09
+- **Severity**: Critical
+- **Component**: Next.js App Router / Deployment
+- **Status**: [Resolved ✅]
+- **Description**: Vercel production deployment failed during server file tracing with: `Error: ENOENT: no such file or directory, lstat '/vercel/path0/.next/server/app/(dashboard)/page_client-reference-manifest.js'`.
+- **Root Cause**: Coexistence of root `app/page.tsx` and route-group `app/(dashboard)/page.tsx`. In Next.js App Router, route groups `(group)` do not introduce URL path segments, so both pages targeted `/`. During Next.js production build tracing, the client reference manifest for `app/(dashboard)/page` was overwritten/deleted by `app/page`, causing the trace step to fail on the missing manifest.
+- **Resolution**: Removed duplicate `app/(dashboard)/page.tsx` and consolidated the main dashboard under `app/(dashboard)/dashboard/page.tsx` with rewrite routing in `next.config.mjs`. Cleared build cache and confirmed zero collisions.
+- **Prevention**: Never create identical route paths across route groups and root app directory.
+
+### BUG-004: Strict UUID Validator Rejecting Demo/Sample Entities in API Routes
+- **Date**: 2026-09-09
+- **Severity**: High
+- **Component**: API Routes / Validation
+- **Status**: [Resolved ✅]
+- **Description**: Calling `/api/emails/draft`, `/api/emails/batch-send`, or `/api/replies/simulate` with sample company IDs (e.g., `"1"`) or mock IDs failed with Zod validation error: `"Invalid company ID"`.
+- **Root Cause**: Schemas strictly required `z.string().uuid()` instead of `z.string().min(1)`, causing pre-populated sample sponsors to fail validation before AI drafting.
+- **Resolution**: Updated `draftRequestSchema`, `batchSendSchema`, and `simulateSchema` to accept any non-empty string identifier (`z.string().min(1)`), and added sample company lookup fallbacks.
+- **Prevention**: Use relaxed string constraints on user-facing API routes where mock or imported external IDs might exist alongside UUIDs.
+
+### BUG-005: Header User Email Statically Hardcoded to `"doyin@example.com"`
+- **Date**: 2026-09-09
+- **Severity**: Medium
+- **Component**: Dashboard Header / Auth UI
+- **Status**: [Resolved ✅]
+- **Description**: The top navigation bar always displayed `doyin@example.com` regardless of which account was authenticated.
+- **Root Cause**: `DashboardLayout` passed a hardcoded string `userEmail="doyin@example.com"` to `Header`.
+- **Resolution**: Removed hardcoded prop and updated `Header.tsx` to dynamically query `/api/auth/me` on mount to display the actual authenticated user's email, with a fallback to "Member".
+- **Prevention**: Always decouple user session state from presentation layout wrappers.
+
 ---
 
 ## 🛡️ Known Edge Cases to Guard Against

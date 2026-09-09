@@ -11,7 +11,7 @@ import { recordInboundReply } from "@/lib/db";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 const simulateSchema = z.object({
-  outreach_email_id: z.string().uuid().optional(),
+  outreach_email_id: z.string().min(1).optional(),
   type: z.enum(["positive", "interested", "rejection"]).default("positive"),
 });
 

@@ -1,11 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles, LogOut, User, Bell } from "lucide-react";
 
 export function Header({ userEmail }: { userEmail?: string }) {
+  const [email, setEmail] = useState(userEmail || "");
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user?.email) {
+          setEmail(data.user.email);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -37,7 +50,7 @@ export function Header({ userEmail }: { userEmail?: string }) {
           
           <div className="flex items-center gap-3 pl-3 border-l border-white/10">
             <div className="hidden sm:flex flex-col text-right">
-              <span className="text-xs font-medium text-white">{userEmail || "Member"}</span>
+              <span className="text-xs font-medium text-white">{email || userEmail || "Member"}</span>
               <span className="text-[10px] text-neutral-500">Free Tier</span>
             </div>
             <Button

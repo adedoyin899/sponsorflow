@@ -35,6 +35,7 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -60,11 +61,18 @@ export function LoginForm() {
         throw new Error(data.error || "Invalid email or password");
       }
 
-      router.push("/dashboard");
+      const redirectUrl = searchParams.get("redirect") || "/dashboard";
+      router.push(redirectUrl);
       router.refresh();
     } catch (err: any) {
       setServerError(err.message || "Invalid email or password");
     }
+  };
+
+  const handleFillDemo = () => {
+    setValue("email", "demo@sponsorflow.io");
+    setValue("password", "DemoPassword123!");
+    setServerError(null);
   };
 
   const handleGoogleLogin = () => {
@@ -95,6 +103,20 @@ export function LoginForm() {
         error={errors.password?.message}
         {...register("password")}
       />
+
+      <div className="p-3 rounded-xl bg-brand-aloe/10 border border-brand-aloe/20 flex items-center justify-between gap-2 text-xs text-neutral-300">
+        <div>
+          <span className="text-white font-medium block">Testing on live Vercel?</span>
+          <span className="text-[11px] text-neutral-400">Instant test credentials provided.</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleFillDemo}
+          className="text-xs px-2.5 py-1 rounded-lg bg-brand-aloe text-black font-semibold hover:bg-brand-aloe/90 transition-colors"
+        >
+          Fill Demo
+        </button>
+      </div>
 
       <Button
         type="submit"
