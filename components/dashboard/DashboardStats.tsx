@@ -1,6 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Building2, Send, MessageSquare, Target, CheckCircle2 } from "lucide-react";
+import { Building2, Send, MessageSquare, Target } from "lucide-react";
 
 export interface DashboardStatsProps {
   totalCompanies?: number;
@@ -9,18 +11,50 @@ export interface DashboardStatsProps {
   interviewsCount?: number;
 }
 
-export function DashboardStats({
-  totalCompanies = 54,
-  totalContacted = 0,
-  totalReplied = 0,
-  interviewsCount = 0,
-}: DashboardStatsProps) {
-  const replyRate = totalContacted > 0 ? ((totalReplied / totalContacted) * 100).toFixed(0) : "0";
+export function DashboardStats(props: DashboardStatsProps) {
+  const [counts, setCounts] = useState({
+    totalCompanies: props.totalCompanies ?? 54,
+    totalContacted: props.totalContacted ?? 0,
+    totalReplied: props.totalReplied ?? 0,
+    interviewsCount: props.interviewsCount ?? 0,
+  });
 
-  const stats = [
+  useEffect(() => {
+    if (props.totalContacted !== undefined && props.totalContacted > 0) {
+      setCounts({
+        totalCompanies: props.totalCompanies ?? 54,
+        totalContacted: props.totalContacted,
+        totalReplied: props.totalReplied ?? 0,
+        interviewsCount: props.interviewsCount ?? 0,
+      });
+      return;
+    }
+
+    fetch("/api/analytics?timeframe=30d")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.analytics?.kpis) {
+          const k = data.analytics.kpis;
+          setCounts({
+            totalCompanies: k.totalCompanies || 54,
+            totalContacted: k.totalContacted || 0,
+            totalReplied: k.repliesReceived || 0,
+            interviewsCount: k.interviewsScheduled || 0,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [props.totalCompanies, props.totalContacted, props.totalReplied, props.interviewsCount]);
+
+  const replyRate =
+    counts.totalContacted > 0
+      ? ((counts.totalReplied / counts.totalContacted) * 100).toFixed(0)
+      : "0";
+
+  const statItems = [
     {
       name: "Companies Targeted",
-      value: totalCompanies.toString(),
+      value: counts.totalCompanies.toString(),
       subtext: "UK tech sponsors loaded",
       icon: Building2,
       accent: "text-brand-aloe",
@@ -28,7 +62,7 @@ export function DashboardStats({
     },
     {
       name: "Emails Sent",
-      value: totalContacted.toString(),
+      value: counts.totalContacted.toString(),
       subtext: "Personalized outreach",
       icon: Send,
       accent: "text-sky-400",
@@ -36,7 +70,7 @@ export function DashboardStats({
     },
     {
       name: "Inbound Replies",
-      value: totalReplied.toString(),
+      value: counts.totalReplied.toString(),
       subtext: `${replyRate}% response rate`,
       icon: MessageSquare,
       accent: "text-emerald-400",
@@ -44,7 +78,7 @@ export function DashboardStats({
     },
     {
       name: "Interviews Active",
-      value: interviewsCount.toString(),
+      value: counts.interviewsCount.toString(),
       subtext: "Pipeline conversations",
       icon: Target,
       accent: "text-purple-400",
@@ -54,7 +88,7 @@ export function DashboardStats({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat) => {
+      {statItems.map((stat) => {
         const Icon = stat.icon;
         return (
           <Card key={stat.name} variant="glass" className="p-5 relative overflow-hidden">

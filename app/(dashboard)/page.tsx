@@ -48,12 +48,7 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* Metrics Row */}
-      <DashboardStats
-        totalCompanies={54}
-        totalContacted={14}
-        totalReplied={5}
-        interviewsCount={2}
-      />
+      <DashboardStats />
 
       {/* Main Grid: Pending Approvals & Profile Status */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
