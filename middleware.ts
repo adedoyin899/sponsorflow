@@ -9,6 +9,7 @@ export function middleware(request: NextRequest) {
     "/profile",
     "/companies",
     "/emails",
+    "/replies",
     "/analytics",
     "/onboarding",
   ];
@@ -39,6 +40,7 @@ export const config = {
     "/profile/:path*",
     "/companies/:path*",
     "/emails/:path*",
+    "/replies/:path*",
     "/analytics/:path*",
     "/onboarding/:path*",
     "/login",

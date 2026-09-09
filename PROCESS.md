@@ -55,13 +55,35 @@
 [Prompt 8]  Email Review, Edit & Approval Workflow    [Completed ✅]
 [Prompt 9]  Gmail OAuth Integration                   [Completed ✅]
 [Prompt 10] Email Dispatcher & Rate Limiter           [Completed ✅]
-[Prompt 11] Gmail Pub/Sub Webhook & AI Classifier     [Pending]
+[Prompt 11] Gmail Pub/Sub Webhook & AI Classifier     [Completed ✅]
 [Prompt 12] Outreach Pipeline & Analytics Dashboard   [Pending]
 ```
 
 ---
 
 ## 5. 🏗️ Build Log & Milestones
+
+### Milestone 11: Gmail Pub/Sub Webhook & AI Reply Intent Classifier
+- **Date**: 2026-09-09
+- **Status**: Completed ✅
+- **Details**:
+  - Implemented AI reply intent classifier in `lib/reply-classifier.ts`:
+    - Leverages Claude 3 Haiku structured prompt to categorize inbound hiring replies (`positive`, `interested`, `rejection`, `not_a_fit`, `question`, `out_of_office`, `other`).
+    - Produces confidence score, 1-sentence summary, and actionable candidate recommendation.
+    - Heuristic rule engine fallback ensures zero downtime and resilient offline development.
+  - Implemented inbound database transactions in `lib/db.ts`:
+    - `recordInboundReply()` — persists to `email_replies`, triggers AI classification, updates linked `outreach_emails` to `replied`, and cascades status update to `companies`.
+    - `getInboundRepliesForUser()` — retrieves user replies with outreach joins and classification filtering.
+  - Built webhook and simulation API routes:
+    - `POST /api/gmail/webhook` — Google Cloud Pub/Sub push notification receiver decoding base64 Gmail payloads.
+    - `GET / POST /api/replies` — reply directory query and ingestion.
+    - `POST /api/replies/simulate` — developer sandbox simulating realistic positive, interested, and rejection responses.
+  - Built user interface and navigation:
+    - `app/(dashboard)/replies/page.tsx` — tabbed sentiment view (All, Positive, Interested, Rejection), confidence badges, suggested actions, expandable thread preview, and simulator buttons.
+    - Added Inbound Replies to `components/dashboard/Sidebar.tsx` and protected routes in `middleware.ts`.
+    - Configured rewrites in `next.config.mjs` and generated `/dashboard` standalone overview page.
+  - Verified: `npx tsc --noEmit` (0 errors) + `npm run build` (55/55 routes ✅).
+
 
 ### Milestone 10: Email Dispatcher, Rate Limiting & Quota Protection
 - **Date**: 2026-09-05

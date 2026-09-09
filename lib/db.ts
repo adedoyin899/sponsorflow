@@ -968,5 +968,103 @@ export async function recordEmailDispatched(
   return email;
 }
 
+// ==============================================================================
+// INBOUND REPLIES & INTENT TRACKING
+// ==============================================================================
+
+type EmailReplyRow = Database["public"]["Tables"]["email_replies"]["Row"];
+
+export interface RecordReplyInput {
+  outreach_email_id?: string | null;
+  from_email: string;
+  from_name?: string | null;
+  subject?: string | null;
+  body: string;
+  gmail_message_id?: string | null;
+  gmail_thread_id?: string | null;
+}
+
+export async function recordInboundReply(
+  userId: string,
+  input: RecordReplyInput
+): Promise<EmailReplyRow> {
+  const supabase = createServerSupabaseClient();
+  const now = new Date().toISOString();
+
+  // 1. Analyze intent via classifier
+  const { classifyInboundReply } = await import("./reply-classifier");
+  const analysis = await classifyInboundReply(input.subject || "", input.body);
+
+  // 2. Insert into email_replies
+  const { data: reply, error: replyErr } = await (supabase
+    .from("email_replies")
+    .insert({
+      user_id: userId,
+      outreach_email_id: input.outreach_email_id || null,
+      from_email: input.from_email,
+      from_name: input.from_name || null,
+      subject: input.subject || null,
+      body: input.body,
+      received_at: now,
+      ai_classification: analysis.classification,
+      ai_confidence: analysis.confidence,
+      ai_summary: analysis.summary,
+      suggested_action: analysis.suggestedAction,
+      gmail_message_id: input.gmail_message_id || null,
+      gmail_thread_id: input.gmail_thread_id || null,
+      is_read: false,
+    })
+    .select()
+    .single() as unknown as Promise<{ data: EmailReplyRow | null; error: { message: string } | null }>);
+
+  if (replyErr || !reply) {
+    throw new Error(replyErr?.message || "Failed to record email reply");
+  }
+
+  // 3. Update outreach email and company status if linked
+  if (input.outreach_email_id) {
+    await supabase
+      .from("outreach_emails")
+      .update({ status: "replied", updated_at: now })
+      .eq("id", input.outreach_email_id);
+
+    // Get company ID from email to update company status
+    const { data: linkedEmail } = await (supabase
+      .from("outreach_emails")
+      .select("company_id")
+      .eq("id", input.outreach_email_id)
+      .maybeSingle() as unknown as Promise<{ data: { company_id: string } | null }>);
+
+    if (linkedEmail?.company_id) {
+      await supabase
+        .from("companies")
+        .update({ status: "replied", updated_at: now })
+        .eq("id", linkedEmail.company_id);
+    }
+  }
+
+  return reply;
+}
+
+export async function getInboundRepliesForUser(
+  userId: string,
+  filter?: { classification?: string }
+): Promise<Array<EmailReplyRow & { outreach_email?: OutreachEmailRow | null }>> {
+  const supabase = createServerSupabaseClient();
+  let query = supabase
+    .from("email_replies")
+    .select("*, outreach_email:outreach_emails(*)")
+    .eq("user_id", userId)
+    .order("received_at", { ascending: false });
+
+  if (filter?.classification && filter.classification !== "all") {
+    query = query.eq("ai_classification", filter.classification);
+  }
+
+  const { data } = await (query as unknown as Promise<{ data: any[] | null }>);
+  return data || [];
+}
+
+
 
 

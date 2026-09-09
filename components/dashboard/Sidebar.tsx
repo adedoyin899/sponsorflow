@@ -13,6 +13,7 @@ import {
   Settings,
   Sparkles,
   UploadCloud,
+  MessageSquare,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -23,6 +24,7 @@ export function Sidebar() {
     { name: "Profile & Positioning", href: "/dashboard/profile", icon: User },
     { name: "Companies", href: "/dashboard/companies", icon: Building2 },
     { name: "Outreach & Drafts", href: "/dashboard/emails", icon: Mail },
+    { name: "Inbound Replies", href: "/dashboard/replies", icon: MessageSquare },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   ];
 
@@ -31,7 +33,12 @@ export function Sidebar() {
       <div className="space-y-6">
         <nav className="space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href;
+            const normalizedPath = pathname.replace(/^\/dashboard/, "") || "/dashboard";
+            const normalizedHref = item.href.replace(/^\/dashboard/, "") || "/dashboard";
+            const isActive =
+              pathname === item.href ||
+              normalizedPath === normalizedHref ||
+              (normalizedHref !== "/dashboard" && pathname.startsWith(item.href));
             const Icon = item.icon;
             return (
               <Link
