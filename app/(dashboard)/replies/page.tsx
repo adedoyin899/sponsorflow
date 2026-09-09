@@ -105,14 +105,14 @@ export default function RepliesDashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-brand-aloe font-medium mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs text-emerald-800 dark:text-brand-aloe font-medium mb-1">
             <MessageSquare className="w-3.5 h-3.5" />
             <span>Closed-Loop Intent Intelligence</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
             Inbound Email Replies
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
             Incoming replies detected from Gmail are classified automatically with suggested action workflows.
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function RepliesDashboardPage() {
             onClick={() => handleSimulate("positive")}
             className="text-xs gap-1.5"
           >
-            <Sparkles className="w-3.5 h-3.5 text-brand-aloe" /> Simulate Positive
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-brand-aloe" /> Simulate Positive
           </Button>
           <Button
             variant="outline"
@@ -134,13 +134,13 @@ export default function RepliesDashboardPage() {
             onClick={() => handleSimulate("interested")}
             className="text-xs gap-1.5"
           >
-            <Clock className="w-3.5 h-3.5 text-amber-400" /> Simulate Warm
+            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" /> Simulate Warm
           </Button>
         </div>
       </div>
 
       {feedback && (
-        <div className="p-3 rounded-xl bg-brand-aloe/10 border border-brand-aloe/30 text-xs text-brand-aloe flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-brand-aloe/10 border border-emerald-200 dark:border-brand-aloe/30 text-xs text-emerald-800 dark:text-brand-aloe flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{feedback}</span>
         </div>
@@ -148,43 +148,43 @@ export default function RepliesDashboardPage() {
 
       {/* Summary Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card variant="glass" className="p-4 flex items-center justify-between border-brand-aloe/20 bg-brand-aloe/5">
+        <Card variant="glass" className="p-4 flex items-center justify-between border-emerald-500/20 bg-emerald-50/50 dark:bg-brand-aloe/5">
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 block font-medium">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-medium">
               🟢 Positive / Interview
             </span>
-            <span className="text-2xl font-light text-brand-aloe">{positiveCount}</span>
+            <span className="text-2xl font-light text-emerald-700 dark:text-brand-aloe">{positiveCount}</span>
           </div>
           <Badge variant="aloe">High Priority</Badge>
         </Card>
 
-        <Card variant="glass" className="p-4 flex items-center justify-between border-amber-400/20 bg-amber-400/5">
+        <Card variant="glass" className="p-4 flex items-center justify-between border-amber-400/20 bg-amber-50/50 dark:bg-amber-400/5">
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 block font-medium">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-medium">
               🟡 Warm Lead / Keep In Touch
             </span>
-            <span className="text-2xl font-light text-amber-400">{interestedCount}</span>
+            <span className="text-2xl font-light text-amber-600 dark:text-amber-400">{interestedCount}</span>
           </div>
-          <Badge variant="outline" className="text-amber-400 border-amber-400/30">Nurture</Badge>
+          <Badge variant="warning">Nurture</Badge>
         </Card>
 
-        <Card variant="glass" className="p-4 flex items-center justify-between border-red-400/20 bg-red-400/5">
+        <Card variant="glass" className="p-4 flex items-center justify-between border-red-400/20 bg-red-50/50 dark:bg-red-400/5">
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 block font-medium">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-medium">
               🔴 Rejections / Closed
             </span>
-            <span className="text-2xl font-light text-red-400">{rejectionCount}</span>
+            <span className="text-2xl font-light text-red-600 dark:text-red-400">{rejectionCount}</span>
           </div>
-          <Badge variant="outline" className="text-red-400 border-red-400/30">Archived</Badge>
+          <Badge variant="danger">Archived</Badge>
         </Card>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 rounded-xl p-1 text-xs w-fit">
+      <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-1 text-xs w-fit">
         <button
           onClick={() => setActiveTab("all")}
           className={`px-3 py-1.5 rounded-lg transition-all ${
-            activeTab === "all" ? "bg-neutral-800 text-white font-medium" : "text-neutral-400 hover:text-white"
+            activeTab === "all" ? "bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white font-semibold shadow-sm" : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
           }`}
         >
           All ({replies.length})
@@ -192,7 +192,7 @@ export default function RepliesDashboardPage() {
         <button
           onClick={() => setActiveTab("positive")}
           className={`px-3 py-1.5 rounded-lg transition-all ${
-            activeTab === "positive" ? "bg-brand-aloe/20 text-brand-aloe font-medium" : "text-neutral-400 hover:text-white"
+            activeTab === "positive" ? "bg-brand-aloe/30 dark:bg-brand-aloe/20 text-emerald-950 dark:text-brand-aloe font-semibold shadow-sm" : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
           }`}
         >
           Positive ({positiveCount})
@@ -200,7 +200,7 @@ export default function RepliesDashboardPage() {
         <button
           onClick={() => setActiveTab("interested")}
           className={`px-3 py-1.5 rounded-lg transition-all ${
-            activeTab === "interested" ? "bg-amber-400/20 text-amber-300 font-medium" : "text-neutral-400 hover:text-white"
+            activeTab === "interested" ? "bg-amber-50 dark:bg-amber-400/20 text-amber-900 dark:text-amber-300 font-semibold shadow-sm" : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
           }`}
         >
           Interested ({interestedCount})
@@ -208,7 +208,7 @@ export default function RepliesDashboardPage() {
         <button
           onClick={() => setActiveTab("rejection")}
           className={`px-3 py-1.5 rounded-lg transition-all ${
-            activeTab === "rejection" ? "bg-red-400/20 text-red-300 font-medium" : "text-neutral-400 hover:text-white"
+            activeTab === "rejection" ? "bg-red-50 dark:bg-red-400/20 text-red-900 dark:text-red-300 font-semibold shadow-sm" : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
           }`}
         >
           Rejections ({rejectionCount})
@@ -218,10 +218,10 @@ export default function RepliesDashboardPage() {
       {/* Empty State */}
       {filtered.length === 0 && !isLoading && (
         <Card variant="glass" className="p-12 text-center space-y-3">
-          <MessageSquare className="w-10 h-10 text-neutral-600 mx-auto" />
+          <MessageSquare className="w-10 h-10 text-neutral-400 dark:text-neutral-600 mx-auto" />
           <div className="space-y-1">
-            <h3 className="text-sm font-medium text-white">No replies in this category yet</h3>
-            <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+            <h3 className="text-sm font-medium text-neutral-950 dark:text-white">No replies in this category yet</h3>
+            <p className="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto">
               Incoming responses will be parsed and classified here. You can use the "Simulate" buttons above to test the classification flow.
             </p>
           </div>
@@ -240,12 +240,12 @@ export default function RepliesDashboardPage() {
             <Card
               key={reply.id}
               variant="glass"
-              className="p-5 space-y-3 transition-colors border border-white/5 hover:border-white/10"
+              className="p-5 space-y-3 transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="space-y-1 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-white text-sm">
+                    <span className="font-semibold text-neutral-950 dark:text-white text-sm">
                       {reply.from_name || reply.from_email}
                     </span>
                     <span className="text-xs text-neutral-500 font-mono">
@@ -258,30 +258,30 @@ export default function RepliesDashboardPage() {
                       </Badge>
                     )}
                     {isInterested && (
-                      <Badge variant="outline" className="text-amber-300 border-amber-400/40 text-[10px]">
+                      <Badge variant="warning" className="text-[10px]">
                         🟡 Interested ({reply.ai_confidence}%)
                       </Badge>
                     )}
                     {isRejection && (
-                      <Badge variant="outline" className="text-red-300 border-red-400/40 text-[10px]">
+                      <Badge variant="danger" className="text-[10px]">
                         🔴 Rejection ({reply.ai_confidence}%)
                       </Badge>
                     )}
                   </div>
 
-                  <p className="text-xs font-medium text-neutral-200">
+                  <p className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
                     {reply.subject || "Re: Outreach"}
                   </p>
 
                   {reply.ai_summary && (
-                    <p className="text-xs text-brand-mint font-medium">
+                    <p className="text-xs text-emerald-700 dark:text-brand-mint font-medium">
                       AI Summary: {reply.ai_summary}
                     </p>
                   )}
 
                   {reply.suggested_action && (
-                    <div className="text-[11px] text-neutral-400 flex items-center gap-1.5 pt-0.5">
-                      <span className="text-neutral-500 font-semibold">Suggested Action:</span>
+                    <div className="text-[11px] text-neutral-600 dark:text-neutral-400 flex items-center gap-1.5 pt-0.5">
+                      <span className="text-neutral-800 dark:text-neutral-500 font-semibold">Suggested Action:</span>
                       <span>{reply.suggested_action}</span>
                     </div>
                   )}
@@ -292,7 +292,7 @@ export default function RepliesDashboardPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setExpandedId(isExpanded ? null : reply.id)}
-                    className="text-neutral-400 hover:text-white text-xs h-8 px-2"
+                    className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white text-xs h-8 px-2"
                   >
                     {isExpanded ? (
                       <>
@@ -317,8 +317,8 @@ export default function RepliesDashboardPage() {
 
               {/* Full Email Message Box */}
               {isExpanded && (
-                <div className="mt-3 pt-3 border-t border-white/5 space-y-2 text-xs">
-                  <div className="bg-neutral-900/90 rounded-xl p-4 text-neutral-300 font-mono whitespace-pre-wrap leading-relaxed">
+                <div className="mt-3 pt-3 border-t border-neutral-200/70 dark:border-white/5 space-y-2 text-xs">
+                  <div className="bg-neutral-50 dark:bg-neutral-900/90 rounded-xl p-4 text-neutral-800 dark:text-neutral-200 font-mono whitespace-pre-wrap leading-relaxed border border-neutral-200/80 dark:border-neutral-800">
                     {reply.body}
                   </div>
                 </div>

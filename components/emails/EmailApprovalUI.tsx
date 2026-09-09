@@ -100,20 +100,20 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
       {/* Header & Batch Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-white">Outreach Review Queue</h2>
-          <p className="text-xs text-neutral-400">
+          <h2 className="text-base font-semibold text-neutral-950 dark:text-white">Outreach Review Queue</h2>
+          <p className="text-xs text-neutral-600 dark:text-neutral-400">
             {readyCount} approved of {emails.length} generated drafts
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 rounded-xl p-1 text-[11px]">
+          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-1 text-[11px]">
             <button
               onClick={() => setActiveTab("pending")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
                 activeTab === "pending"
-                  ? "bg-neutral-800 text-white font-medium"
-                  : "text-neutral-400 hover:text-white"
+                  ? "bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white font-semibold shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
               }`}
             >
               Drafts ({draftCount})
@@ -122,8 +122,8 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
               onClick={() => setActiveTab("approved")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
                 activeTab === "approved"
-                  ? "bg-brand-aloe/20 text-brand-aloe font-medium"
-                  : "text-neutral-400 hover:text-white"
+                  ? "bg-brand-aloe/30 dark:bg-brand-aloe/20 text-emerald-950 dark:text-brand-aloe font-semibold shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
               }`}
             >
               Approved ({readyCount})
@@ -132,8 +132,8 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
               onClick={() => setActiveTab("all")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
                 activeTab === "all"
-                  ? "bg-neutral-800 text-white font-medium"
-                  : "text-neutral-400 hover:text-white"
+                  ? "bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white font-semibold shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
               }`}
             >
               All ({emails.length})
@@ -145,10 +145,10 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
       {/* Email Cards List */}
       {filtered.length === 0 && !isLoading && (
         <Card variant="glass" className="p-8 text-center space-y-2">
-          <Mail className="w-8 h-8 text-neutral-600 mx-auto" />
-          <p className="text-xs text-neutral-400">
+          <Mail className="w-8 h-8 text-neutral-400 dark:text-neutral-600 mx-auto" />
+          <p className="text-xs text-neutral-600 dark:text-neutral-400">
             {activeTab === "pending"
-              ? "No draft emails pending review. Select a company above to generate a draft!"
+              ? "No draft emails pending review. Select a company to generate a draft!"
               : activeTab === "approved"
               ? "No approved emails yet. Review and approve drafts to prepare your sending queue."
               : "No outreach emails created yet."}
@@ -166,37 +166,33 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
             <Card
               key={email.id}
               variant="glass"
-              className="p-4 space-y-3 transition-colors border border-white/5 hover:border-white/10"
+              className="p-4 space-y-3 transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="space-y-1 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-white text-sm">
+                    <span className="font-semibold text-neutral-950 dark:text-white text-sm">
                       {companyName}
                     </span>
                     {email.to_name && (
-                      <span className="text-xs text-neutral-400">({email.to_name})</span>
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400">({email.to_name})</span>
                     )}
                     <Badge variant="outline">{industry}</Badge>
                     {email.status === "ready_to_send" && (
                       <Badge variant="aloe">Approved</Badge>
                     )}
                     {email.status === "draft" && (
-                      <Badge variant="outline" className="text-amber-400 border-amber-400/30">
-                        Draft
-                      </Badge>
+                      <Badge variant="warning">Draft</Badge>
                     )}
                     {email.status === "rejected" && (
-                      <Badge variant="outline" className="text-red-400 border-red-400/30">
-                        Skipped
-                      </Badge>
+                      <Badge variant="danger">Skipped</Badge>
                     )}
                   </div>
 
-                  <p className="text-xs font-medium text-neutral-200">{email.subject}</p>
+                  <p className="text-xs font-medium text-neutral-800 dark:text-neutral-200">{email.subject}</p>
 
                   {email.ai_positioning_angle && (
-                    <span className="text-[10px] text-neutral-400 block">
+                    <span className="text-[10px] text-emerald-800 dark:text-brand-aloe font-mono block">
                       Angle: {email.ai_positioning_angle}
                     </span>
                   )}
@@ -207,7 +203,7 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
                     variant="ghost"
                     size="sm"
                     onClick={() => setExpandedId(isExpanded ? null : email.id)}
-                    className="text-neutral-400 hover:text-white text-xs h-8 px-2"
+                    className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white text-xs h-8 px-2"
                   >
                     {isExpanded ? (
                       <>
@@ -226,7 +222,7 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
                       size="sm"
                       disabled={actionLoadingId === email.id}
                       onClick={() => updateStatus(email.id, "ready_to_send")}
-                      className="gap-1 h-8"
+                      className="gap-1 h-8 text-xs"
                     >
                       <Check className="w-3.5 h-3.5" /> Approve
                     </Button>
@@ -236,7 +232,7 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
                       size="sm"
                       disabled={actionLoadingId === email.id}
                       onClick={() => updateStatus(email.id, "draft")}
-                      className="h-8 text-xs text-neutral-300"
+                      className="h-8 text-xs"
                     >
                       Undo
                     </Button>
@@ -247,7 +243,8 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
                     size="sm"
                     disabled={actionLoadingId === email.id}
                     onClick={() => updateStatus(email.id, "rejected")}
-                    className="text-neutral-500 hover:text-red-400 h-8 px-2"
+                    className="text-neutral-500 hover:text-red-500 h-8 px-2"
+                    title="Skip outreach"
                   >
                     <X className="w-3.5 h-3.5" />
                   </Button>
@@ -256,11 +253,11 @@ export function EmailApprovalUI({ refreshTrigger }: { refreshTrigger?: number })
 
               {/* Expandable Email Body View */}
               {isExpanded && (
-                <div className="mt-3 pt-3 border-t border-white/5 space-y-2 text-xs">
-                  <div className="text-[11px] text-neutral-400 font-mono">
+                <div className="mt-3 pt-3 border-t border-neutral-200/70 dark:border-white/5 space-y-2 text-xs">
+                  <div className="text-[11px] text-neutral-600 dark:text-neutral-400 font-mono">
                     Recipient: {email.to_email}
                   </div>
-                  <div className="bg-neutral-900/90 rounded-xl p-3 text-neutral-300 font-mono whitespace-pre-wrap leading-relaxed">
+                  <div className="bg-neutral-50 dark:bg-neutral-900/90 rounded-xl p-3 text-neutral-800 dark:text-neutral-200 font-mono whitespace-pre-wrap leading-relaxed border border-neutral-200/80 dark:border-neutral-800">
                     {email.body}
                   </div>
                 </div>

@@ -14,7 +14,6 @@ import {
   Target,
   Sparkles,
   ArrowRight,
-  ArrowUpRight,
   RefreshCw,
   Download,
   Calendar,
@@ -23,9 +22,6 @@ import {
   HelpCircle,
   Clock,
   ExternalLink,
-  Users,
-  Briefcase,
-  Layers,
   Flame,
 } from "lucide-react";
 import { AnalyticsSummary } from "@/lib/db";
@@ -92,7 +88,6 @@ export default function AnalyticsDashboardPage() {
     sentiments.rejection +
     sentiments.other;
 
-  // Max value in timeline for relative bar height scaling
   const maxDayCount = Math.max(
     ...timeline.map((t) => Math.max(t.sent, t.replied, 1)),
     4
@@ -122,29 +117,29 @@ export default function AnalyticsDashboardPage() {
       {/* Top Header & Context Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-brand-aloe tracking-wide uppercase mb-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-brand-aloe tracking-wide uppercase mb-1">
             <BarChart3 className="w-3.5 h-3.5" />
             <span>Executive Performance & Conversion Engine</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
             Outreach Pipeline & Analytics
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl leading-relaxed">
             Real-time conversion tracking across curated UK sponsors, response sentiment breakdown, and vertical performance.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Timeframe Filter Pills */}
-          <div className="flex items-center p-1 rounded-xl bg-neutral-900 border border-white/5 text-xs">
+          <div className="flex items-center p-1 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-white/5 text-xs">
             {(["7d", "14d", "30d", "all"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   timeframe === tf
-                    ? "bg-brand-aloe text-black shadow-sm"
-                    : "text-neutral-400 hover:text-white"
+                    ? "bg-brand-aloe text-neutral-950 shadow-sm"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
                 }`}
               >
                 {tf === "7d"
@@ -163,7 +158,6 @@ export default function AnalyticsDashboardPage() {
             size="sm"
             onClick={() => fetchAnalytics(timeframe)}
             disabled={isLoading}
-            className="border-white/10"
           >
             <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
@@ -173,7 +167,6 @@ export default function AnalyticsDashboardPage() {
             variant="secondary"
             size="sm"
             onClick={handleExportCSV}
-            className="border-white/10"
           >
             <Download className="w-3.5 h-3.5 mr-1.5" />
             Export CSV
@@ -182,7 +175,7 @@ export default function AnalyticsDashboardPage() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
           <span>{error}</span>
           <Button variant="ghost" size="sm" onClick={() => fetchAnalytics(timeframe)}>
             Try again
@@ -195,19 +188,19 @@ export default function AnalyticsDashboardPage() {
         {/* Metric 1: Targeted Sponsors */}
         <Card variant="glass" className="p-5 relative overflow-hidden space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-neutral-400">Targeted Sponsors</span>
-            <div className="p-2 rounded-xl bg-brand-aloe/10 text-brand-aloe">
+            <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">Targeted Sponsors</span>
+            <div className="p-2 rounded-xl bg-emerald-50 dark:bg-brand-aloe/10 text-emerald-800 dark:text-brand-aloe">
               <Building2 className="w-4 h-4" />
             </div>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
                 {kpis.totalCompanies}
               </span>
-              <span className="text-[11px] text-brand-aloe font-medium">UK Licensed</span>
+              <span className="text-[11px] text-emerald-700 dark:text-brand-aloe font-medium">UK Licensed</span>
             </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
               Curated Skilled Worker sponsors
             </p>
           </div>
@@ -216,21 +209,21 @@ export default function AnalyticsDashboardPage() {
         {/* Metric 2: Outreach Sent */}
         <Card variant="glass" className="p-5 relative overflow-hidden space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-neutral-400">Outreach Sent</span>
-            <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
+            <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">Outreach Sent</span>
+            <div className="p-2 rounded-xl bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400">
               <Send className="w-4 h-4" />
             </div>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
                 {kpis.emailsSent}
               </span>
-              <span className="text-[11px] text-neutral-400 font-medium">
+              <span className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">
                 ({kpis.totalContacted} companies)
               </span>
             </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
               Cap: 20 emails / day safe dispatch
             </p>
           </div>
@@ -239,19 +232,19 @@ export default function AnalyticsDashboardPage() {
         {/* Metric 3: Open Rate */}
         <Card variant="glass" className="p-5 relative overflow-hidden space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-neutral-400">Estimated Open Rate</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+            <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">Estimated Open Rate</span>
+            <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
                 {kpis.openRate}%
               </span>
-              <span className="text-[11px] text-emerald-400 font-medium">↑ +18%</span>
+              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">↑ +18%</span>
             </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
               vs. 40% tech cold email benchmark
             </p>
           </div>
@@ -260,44 +253,44 @@ export default function AnalyticsDashboardPage() {
         {/* Metric 4: Reply Rate */}
         <Card variant="glass" className="p-5 relative overflow-hidden space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-neutral-400">Response Rate</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">Response Rate</span>
+            <div className="p-2 rounded-xl bg-teal-50 dark:bg-emerald-500/10 text-teal-700 dark:text-emerald-400">
               <MessageSquare className="w-4 h-4" />
             </div>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
                 {kpis.replyRate}%
               </span>
-              <span className="text-[11px] text-emerald-400 font-medium">
+              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
                 {kpis.repliesReceived} replies
               </span>
             </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
               Target benchmark: &gt; 15%
             </p>
           </div>
         </Card>
 
         {/* Metric 5: Warm Leads & Interviews */}
-        <Card variant="glass" className="p-5 relative overflow-hidden space-y-3 border-brand-aloe/20">
+        <Card variant="glass" className="p-5 relative overflow-hidden space-y-3 border-emerald-500/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-brand-aloe">Pipeline Leads</span>
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+            <span className="text-xs font-semibold text-emerald-800 dark:text-brand-aloe">Pipeline Leads</span>
+            <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400">
               <Target className="w-4 h-4" />
             </div>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-bold text-brand-aloe tracking-tight">
+              <span className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-brand-aloe tracking-tight">
                 {kpis.positiveReplies}
               </span>
-              <span className="text-[11px] text-purple-300 font-medium">
+              <span className="text-[11px] text-purple-700 dark:text-purple-300 font-medium">
                 {kpis.interviewsScheduled} interviews
               </span>
             </div>
-            <p className="text-[11px] text-neutral-400 mt-1">
+            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-1">
               CV requests & scheduled chats
             </p>
           </div>
@@ -306,14 +299,14 @@ export default function AnalyticsDashboardPage() {
 
       {/* Interactive Pipeline Conversion Funnel */}
       <Card variant="glass" className="p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-200/80 dark:border-white/5 pb-4">
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-brand-aloe" />
-            <h2 className="text-sm font-semibold text-white">
+            <Flame className="w-4 h-4 text-emerald-700 dark:text-brand-aloe" />
+            <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">
               End-to-End Job Acquisition Pipeline Funnel
             </h2>
           </div>
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">
             Conversion drop-off across outreach stages
           </span>
         </div>
@@ -322,10 +315,10 @@ export default function AnalyticsDashboardPage() {
           {funnel.map((step, idx) => (
             <div
               key={step.stage}
-              className="relative p-4 rounded-xl bg-neutral-900/50 border border-white/5 flex flex-col justify-between space-y-3 hover:border-white/20 transition-colors"
+              className="relative p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200/80 dark:border-white/5 flex flex-col justify-between space-y-3 transition-colors"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase">
+                <span className="text-[10px] font-mono text-neutral-600 dark:text-neutral-400 uppercase">
                   Step 0{idx + 1}
                 </span>
                 <Badge
@@ -336,32 +329,32 @@ export default function AnalyticsDashboardPage() {
               </div>
 
               <div>
-                <span className="text-2xl font-bold text-white block">
+                <span className="text-2xl font-light text-neutral-950 dark:text-white block">
                   {step.count}
                 </span>
-                <span className="text-xs font-medium text-neutral-300 block mt-0.5">
+                <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-300 block mt-0.5">
                   {step.stage}
                 </span>
               </div>
 
-              <div className="w-full bg-neutral-800 rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     idx === 0
                       ? "bg-neutral-400"
                       : idx === 1
-                      ? "bg-sky-400"
+                      ? "bg-sky-500"
                       : idx === 2
-                      ? "bg-emerald-400"
+                      ? "bg-emerald-500"
                       : idx === 3
                       ? "bg-brand-aloe"
-                      : "bg-purple-400"
+                      : "bg-purple-500"
                   }`}
                   style={{ width: `${Math.max(step.percentage, 4)}%` }}
                 />
               </div>
 
-              <span className="text-[10px] text-neutral-400 leading-tight">
+              <span className="text-[10px] text-neutral-600 dark:text-neutral-400 leading-tight">
                 {step.subtext}
               </span>
             </div>
@@ -374,17 +367,17 @@ export default function AnalyticsDashboardPage() {
         {/* Left 2 Cols: Target Industry Performance Table */}
         <div className="lg:col-span-2 space-y-6">
           <Card variant="glass" className="p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <div className="flex items-center justify-between border-b border-neutral-200/80 dark:border-white/5 pb-4">
               <div>
-                <h3 className="text-sm font-semibold text-white">
+                <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">
                   Performance by Target Industry
                 </h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Comparative response and conversion rates by sector
                 </p>
               </div>
               <Link href="/dashboard/companies">
-                <Button variant="ghost" size="sm" className="text-xs text-brand-aloe">
+                <Button variant="ghost" size="sm" className="text-xs text-emerald-800 dark:text-brand-aloe">
                   View All Sponsors <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </Link>
@@ -392,7 +385,7 @@ export default function AnalyticsDashboardPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="border-b border-white/5 text-neutral-400 font-medium">
+                <thead className="border-b border-neutral-200/80 dark:border-white/5 text-neutral-600 dark:text-neutral-400 font-semibold">
                   <tr>
                     <th className="pb-3">Industry Vertical</th>
                     <th className="pb-3 text-center">Targeted</th>
@@ -402,37 +395,37 @@ export default function AnalyticsDashboardPage() {
                     <th className="pb-3 text-right">Reply Rate</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-neutral-300">
+                <tbody className="divide-y divide-neutral-200/80 dark:divide-white/5 text-neutral-800 dark:text-neutral-300">
                   {industries.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-neutral-400">
+                      <td colSpan={6} className="py-6 text-center text-neutral-500">
                         No industry outreach recorded yet. Import sponsors to start tracking.
                       </td>
                     </tr>
                   ) : (
                     industries.map((row) => (
-                      <tr key={row.industry} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-3.5 font-medium text-white">
+                      <tr key={row.industry} className="hover:bg-neutral-50 dark:hover:bg-white/[0.02] transition-colors">
+                        <td className="py-3.5 font-semibold text-neutral-950 dark:text-white">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-brand-aloe" />
                             {row.industry}
                           </div>
                         </td>
-                        <td className="py-3.5 text-center text-neutral-300">
+                        <td className="py-3.5 text-center text-neutral-700 dark:text-neutral-300">
                           {row.companiesTargeted}
                         </td>
-                        <td className="py-3.5 text-center text-neutral-300">
+                        <td className="py-3.5 text-center text-neutral-700 dark:text-neutral-300">
                           {row.emailsSent}
                         </td>
-                        <td className="py-3.5 text-center text-neutral-300">
+                        <td className="py-3.5 text-center text-neutral-700 dark:text-neutral-300">
                           {row.replies}
                         </td>
-                        <td className="py-3.5 text-center font-semibold text-emerald-400">
+                        <td className="py-3.5 text-center font-semibold text-emerald-700 dark:text-emerald-400">
                           {row.positiveReplies}
                         </td>
                         <td className="py-3.5 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <div className="w-16 bg-neutral-800 rounded-full h-1.5 overflow-hidden hidden sm:block">
+                            <div className="w-16 bg-neutral-200 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden hidden sm:block">
                               <div
                                 className="bg-brand-aloe h-full rounded-full"
                                 style={{ width: `${Math.min(row.replyRate * 2, 100)}%` }}
@@ -461,22 +454,22 @@ export default function AnalyticsDashboardPage() {
 
           {/* 14-Day Activity Bar Chart */}
           <Card variant="glass" className="p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <div className="flex items-center justify-between border-b border-neutral-200/80 dark:border-white/5 pb-4">
               <div>
-                <h3 className="text-sm font-semibold text-white">
+                <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">
                   Daily Outbound & Reply Trajectory
                 </h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Daily volume of emails sent vs. inbound responses received
                 </p>
               </div>
 
               <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-1.5 text-neutral-400">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-sky-400" />
+                <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 font-medium">
+                  <span className="w-2.5 h-2.5 rounded-sm bg-sky-500" />
                   <span>Outreach Sent</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-neutral-400">
+                <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400 font-medium">
                   <span className="w-2.5 h-2.5 rounded-sm bg-brand-aloe" />
                   <span>Inbound Replies</span>
                 </div>
@@ -496,7 +489,7 @@ export default function AnalyticsDashboardPage() {
                       className="flex-1 flex flex-col items-center gap-1 h-full justify-end group relative"
                     >
                       {/* Tooltip on hover */}
-                      <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 border border-white/10 text-[10px] rounded-lg px-2 py-1 pointer-events-none whitespace-nowrap z-20 shadow-xl">
+                      <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 text-white border border-neutral-800 text-[10px] rounded-lg px-2 py-1 pointer-events-none whitespace-nowrap z-20 shadow-xl">
                         <span className="font-semibold text-white">{day.label}: </span>
                         <span className="text-sky-400">{day.sent} sent</span>,{" "}
                         <span className="text-brand-aloe">{day.replied} replied</span>
@@ -506,17 +499,17 @@ export default function AnalyticsDashboardPage() {
                       <div className="w-full max-w-[28px] flex items-end justify-center gap-1 h-36">
                         {/* Sent bar */}
                         <div
-                          className="w-full bg-sky-500/80 rounded-t group-hover:bg-sky-400 transition-colors"
+                          className="w-full bg-sky-500/80 rounded-t group-hover:bg-sky-500 transition-colors"
                           style={{ height: `${Math.max(sentHeight, day.sent > 0 ? 8 : 2)}%` }}
                         />
                         {/* Reply bar */}
                         <div
-                          className="w-full bg-brand-aloe rounded-t group-hover:bg-emerald-300 transition-colors"
+                          className="w-full bg-brand-aloe rounded-t group-hover:bg-[#a8f7c3] transition-colors"
                           style={{ height: `${Math.max(replyHeight, day.replied > 0 ? 12 : 2)}%` }}
                         />
                       </div>
 
-                      <span className="text-[9px] sm:text-[10px] text-neutral-400 truncate max-w-full text-center">
+                      <span className="text-[9px] sm:text-[10px] text-neutral-600 dark:text-neutral-400 truncate max-w-full text-center font-mono">
                         {day.label.split(" ")[0]}
                       </span>
                     </div>
@@ -531,15 +524,15 @@ export default function AnalyticsDashboardPage() {
         <div className="space-y-6">
           {/* AI Reply Classification Breakdown */}
           <Card variant="glass" className="p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <div className="flex items-center justify-between border-b border-neutral-200/80 dark:border-white/5 pb-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-brand-aloe" />
-                <h3 className="text-sm font-semibold text-white">
+                <Sparkles className="w-4 h-4 text-emerald-700 dark:text-brand-aloe" />
+                <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">
                   Claude AI Reply Sentiment
                 </h3>
               </div>
               <Link href="/dashboard/replies">
-                <Button variant="ghost" size="sm" className="text-xs text-brand-aloe">
+                <Button variant="ghost" size="sm" className="text-xs text-emerald-800 dark:text-brand-aloe">
                   View Inbox <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </Link>
@@ -550,37 +543,37 @@ export default function AnalyticsDashboardPage() {
                 {
                   label: "Positive (Interview / CV Request)",
                   count: sentiments.positive,
-                  badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+                  badge: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
                   icon: CheckCircle2,
-                  iconColor: "text-emerald-400",
+                  iconColor: "text-emerald-600 dark:text-emerald-400",
                 },
                 {
                   label: "Interested (Future Opening)",
                   count: sentiments.interested,
-                  badge: "bg-brand-aloe/10 text-brand-aloe border-brand-aloe/20",
+                  badge: "bg-brand-aloe text-neutral-950 border-emerald-300 dark:bg-brand-aloe/10 dark:text-brand-aloe dark:border-brand-aloe/20",
                   icon: Sparkles,
-                  iconColor: "text-brand-aloe",
+                  iconColor: "text-emerald-600 dark:text-brand-aloe",
                 },
                 {
                   label: "Question (Visa / Salary / Experience)",
                   count: sentiments.question,
-                  badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+                  badge: "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
                   icon: HelpCircle,
-                  iconColor: "text-blue-400",
+                  iconColor: "text-blue-600 dark:text-blue-400",
                 },
                 {
                   label: "Out of Office (Vacation Auto-Reply)",
                   count: sentiments.out_of_office,
-                  badge: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                  badge: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
                   icon: Clock,
-                  iconColor: "text-amber-400",
+                  iconColor: "text-amber-600 dark:text-amber-400",
                 },
                 {
                   label: "Rejection (Not Hiring / No Visa)",
                   count: sentiments.rejection,
-                  badge: "bg-neutral-800 text-neutral-400 border-white/5",
+                  badge: "bg-neutral-100 text-neutral-700 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-white/5",
                   icon: AlertCircle,
-                  iconColor: "text-neutral-400",
+                  iconColor: "text-neutral-500 dark:text-neutral-400",
                 },
               ].map((item) => {
                 const Icon = item.icon;
@@ -592,15 +585,15 @@ export default function AnalyticsDashboardPage() {
                 return (
                   <div
                     key={item.label}
-                    className="p-3 rounded-xl bg-neutral-900/50 border border-white/5 flex items-center justify-between"
+                    className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200/80 dark:border-white/5 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2.5">
                       <Icon className={`w-4 h-4 ${item.iconColor}`} />
                       <div>
-                        <span className="text-xs font-medium text-white block">
+                        <span className="text-xs font-semibold text-neutral-950 dark:text-white block">
                           {item.label}
                         </span>
-                        <span className="text-[10px] text-neutral-400">
+                        <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
                           {pct}% of all inbound
                         </span>
                       </div>
@@ -617,38 +610,38 @@ export default function AnalyticsDashboardPage() {
           </Card>
 
           {/* Actionable AI Insights Card */}
-          <Card variant="glass" className="p-6 space-y-4 border-brand-aloe/20">
-            <div className="flex items-center gap-2 text-brand-aloe">
+          <Card variant="glass" className="p-6 space-y-4 border-emerald-500/30">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-brand-aloe">
               <Sparkles className="w-4 h-4" />
-              <h3 className="text-sm font-semibold text-white">
+              <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">
                 Campaign Optimization Insights
               </h3>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-neutral-900/60 border border-white/5 space-y-1">
-                <span className="font-semibold text-white block">
+              <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-white/5 space-y-1">
+                <span className="font-semibold text-neutral-950 dark:text-white block">
                   Top Converting Sector: Fintech
                 </span>
-                <p className="text-neutral-400 text-[11px] leading-relaxed">
+                <p className="text-neutral-600 dark:text-neutral-400 text-[11px] leading-relaxed">
                   Your Fintech positioning generates a {kpis.replyRate > 0 ? `${kpis.replyRate}%` : "38%"} response rate. Prioritize dispatching drafts to remaining fintech sponsors like ClearBank and Monzo.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-neutral-900/60 border border-white/5 space-y-1">
-                <span className="font-semibold text-white block">
+              <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-white/5 space-y-1">
+                <span className="font-semibold text-neutral-950 dark:text-white block">
                   Tone Tuning: Direct Voice
                 </span>
-                <p className="text-neutral-400 text-[11px] leading-relaxed">
+                <p className="text-neutral-600 dark:text-neutral-400 text-[11px] leading-relaxed">
                   Emails with 80–110 words focusing on immediate technical value convert 2.2x higher than long corporate introductions.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-neutral-900/60 border border-white/5 space-y-1">
-                <span className="font-semibold text-white block">
+              <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-white/5 space-y-1">
+                <span className="font-semibold text-neutral-950 dark:text-white block">
                   Safe Dispatch Cadence
                 </span>
-                <p className="text-neutral-400 text-[11px] leading-relaxed">
+                <p className="text-neutral-600 dark:text-neutral-400 text-[11px] leading-relaxed">
                   Remaining daily quota: {20 - (kpis.emailsSent % 20)} emails. Gmail deliverability score is in the optimal 98% tier.
                 </p>
               </div>

@@ -13,7 +13,13 @@ export async function GET() {
   }
 
   try {
-    const limits = await getAndResetSendLimits(user.id);
+    const rawLimits = await getAndResetSendLimits(user.id);
+    const limits = rawLimits || {
+      daily_limit: 20,
+      hourly_limit: 5,
+      emails_sent_today: 0,
+      emails_sent_this_hour: 0,
+    };
     const remainingToday = Math.max(0, limits.daily_limit - limits.emails_sent_today);
     const remainingThisHour = Math.max(0, limits.hourly_limit - limits.emails_sent_this_hour);
 

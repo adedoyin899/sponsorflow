@@ -175,29 +175,29 @@ export function ApprovalModal({
   const hook = email.company?.personalization_hook;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
       <div
-        className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-5 border-b border-white/5 flex items-start justify-between gap-4">
+        <div className="p-5 border-b border-neutral-200/80 dark:border-white/5 flex items-start justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-aloe" />
-              <h3 className="text-base font-medium text-white tracking-tight">
+              <Sparkles className="w-4 h-4 text-emerald-700 dark:text-brand-aloe" />
+              <h3 className="text-base font-semibold text-neutral-950 dark:text-white tracking-tight">
                 Review Outreach Draft
               </h3>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-semibold text-white">{companyName}</span>
+              <span className="font-semibold text-neutral-900 dark:text-white">{companyName}</span>
               <Badge variant="outline">{industry}</Badge>
               {email.to_name && (
-                <span className="text-neutral-400">Contact: {email.to_name}</span>
+                <span className="text-neutral-500 dark:text-neutral-400">Contact: {email.to_name}</span>
               )}
             </div>
             {email.ai_positioning_angle && (
-              <p className="text-[11px] text-brand-aloe font-mono">
+              <p className="text-[11px] text-emerald-800 dark:text-brand-aloe font-mono">
                 Positioning Angle: {email.ai_positioning_angle}
               </p>
             )}
@@ -205,7 +205,7 @@ export function ApprovalModal({
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+            className="p-1 rounded-lg text-neutral-500 hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -214,21 +214,21 @@ export function ApprovalModal({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
           {error && (
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-xs text-red-700 dark:text-red-400 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {hook && (
-            <div className="p-3 rounded-xl bg-neutral-800/40 border border-white/5 text-[11px] text-neutral-300">
-              <span className="text-neutral-400">Company Context Hook:</span> {hook}
+            <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200/80 dark:border-white/5 text-[11px] text-neutral-700 dark:text-neutral-300">
+              <span className="text-neutral-500 dark:text-neutral-400 font-semibold">Company Context Hook:</span> {hook}
             </div>
           )}
 
           {/* Subject Field */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
               Subject
             </label>
             {isEditing ? (
@@ -236,10 +236,10 @@ export function ApprovalModal({
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-aloe/50"
+                className="w-full bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-xl px-3 py-2 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-brand-aloe/80"
               />
             ) : (
-              <div className="p-3 rounded-xl bg-neutral-950/80 border border-white/5 text-xs text-white font-medium">
+              <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-950/80 border border-neutral-200/80 dark:border-white/5 text-xs text-neutral-900 dark:text-white font-medium">
                 {subject}
               </div>
             )}
@@ -248,12 +248,14 @@ export function ApprovalModal({
           {/* Email Body */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Email Message
               </label>
               <span
                 className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${
-                  isWordCountIdeal ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
+                  isWordCountIdeal
+                    ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400"
+                    : "bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400"
                 }`}
               >
                 {wordCount} words {isWordCountIdeal ? "✓ (Target 70–150)" : "⚠ (Target 70–150)"}
@@ -265,10 +267,10 @@ export function ApprovalModal({
                 rows={10}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                className="w-full bg-neutral-950 border border-neutral-700 rounded-xl p-3 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-brand-aloe/50 resize-y"
+                className="w-full bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-xl p-3 text-xs text-neutral-900 dark:text-white font-mono leading-relaxed focus:outline-none focus:border-brand-aloe/80 resize-y"
               />
             ) : (
-              <div className="p-4 rounded-xl bg-neutral-950/80 border border-white/5 text-xs text-neutral-200 font-mono leading-relaxed whitespace-pre-wrap">
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/80 border border-neutral-200/80 dark:border-white/5 text-xs text-neutral-800 dark:text-neutral-200 font-mono leading-relaxed whitespace-pre-wrap">
                 {body}
               </div>
             )}
@@ -276,7 +278,7 @@ export function ApprovalModal({
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="p-5 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-900/50">
+        <div className="p-5 border-t border-neutral-200/80 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-neutral-50/80 dark:bg-neutral-900/50">
           <div className="flex items-center gap-2">
             {isEditing ? (
               <Button
@@ -286,7 +288,7 @@ export function ApprovalModal({
                 onClick={handleSaveEdits}
                 className="gap-1.5"
               >
-                <Check className="w-3.5 h-3.5 text-emerald-400" /> Save Edits
+                <Check className="w-3.5 h-3.5 text-emerald-600" /> Save Edits
               </Button>
             ) : (
               <Button
@@ -306,7 +308,7 @@ export function ApprovalModal({
               onClick={handleRegenerate}
               className="gap-1.5"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? "animate-spin text-brand-aloe" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? "animate-spin text-emerald-600 dark:text-brand-aloe" : ""}`} />
               Regenerate
             </Button>
           </div>
@@ -317,7 +319,7 @@ export function ApprovalModal({
               size="sm"
               disabled={isSaving}
               onClick={handleReject}
-              className="text-neutral-400 hover:text-red-400"
+              className="text-neutral-600 hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400"
             >
               Reject Draft
             </Button>

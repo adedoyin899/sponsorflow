@@ -57,32 +57,32 @@ export function DashboardStats(props: DashboardStatsProps) {
       value: counts.totalCompanies.toString(),
       subtext: "UK tech sponsors loaded",
       icon: Building2,
-      accent: "text-brand-aloe",
-      bg: "bg-brand-aloe/10",
+      accent: "text-emerald-700 dark:text-brand-aloe",
+      bg: "bg-emerald-50 dark:bg-brand-aloe/10",
     },
     {
       name: "Emails Sent",
       value: counts.totalContacted.toString(),
       subtext: "Personalized outreach",
       icon: Send,
-      accent: "text-sky-400",
-      bg: "bg-sky-500/10",
+      accent: "text-sky-700 dark:text-sky-400",
+      bg: "bg-sky-50 dark:bg-sky-500/10",
     },
     {
       name: "Inbound Replies",
       value: counts.totalReplied.toString(),
       subtext: `${replyRate}% response rate`,
       icon: MessageSquare,
-      accent: "text-emerald-400",
-      bg: "bg-emerald-500/10",
+      accent: "text-teal-700 dark:text-emerald-400",
+      bg: "bg-teal-50 dark:bg-emerald-500/10",
     },
     {
       name: "Interviews Active",
       value: counts.interviewsCount.toString(),
       subtext: "Pipeline conversations",
       icon: Target,
-      accent: "text-purple-400",
-      bg: "bg-purple-500/10",
+      accent: "text-purple-700 dark:text-purple-400",
+      bg: "bg-purple-50 dark:bg-purple-500/10",
     },
   ];
 
@@ -93,14 +93,16 @@ export function DashboardStats(props: DashboardStatsProps) {
         return (
           <Card key={stat.name} variant="glass" className="p-5 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-400">{stat.name}</span>
+              <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">{stat.name}</span>
               <div className={`p-2 rounded-xl ${stat.bg} ${stat.accent}`}>
                 <Icon className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-4">
-              <span className="text-2xl font-bold text-white tracking-tight">{stat.value}</span>
-              <p className="text-xs text-neutral-500 mt-0.5">{stat.subtext}</p>
+              <span className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
+                {stat.value}
+              </span>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">{stat.subtext}</p>
             </div>
           </Card>
         );

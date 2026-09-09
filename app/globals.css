@@ -5,11 +5,14 @@
 @layer base {
   :root {
     --background: #fbfbf5;
-    --foreground: #0f172a;
+    --foreground: #000000;
     --canvas-cream: #fbfbf5;
+    --canvas-light: #ffffff;
     --canvas-night: #000000;
+    --canvas-night-elevated: #0a0a0a;
+    --surface-elevated-dark: #1e2c31;
     --surface-card: #ffffff;
-    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color: #e4e4e7;
     --aloe: #c1fbd4;
     --pistachio: #d4f9e0;
     --mint: #99b3ad;
@@ -18,7 +21,7 @@
   .dark {
     --background: #000000;
     --foreground: #ffffff;
-    --surface-card: rgba(20, 20, 20, 0.7);
+    --surface-card: #12181b;
     --border-color: rgba(255, 255, 255, 0.08);
   }
 
@@ -27,6 +30,7 @@
     color: var(--foreground);
     font-feature-settings: "ss01", "ss02", "ss03", "cv01", "cv02";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
@@ -44,12 +48,12 @@
   background-color: #fbfbf5;
 }
 
-.text-ink {
-  color: #000000;
+.bg-canvas-light {
+  background-color: #ffffff;
 }
 
-.text-subtle {
-  color: #a1a1aa;
+.text-ink {
+  color: #000000;
 }
 
 .border-hairline-dark {
@@ -60,7 +64,7 @@
   border-color: #e4e4e7;
 }
 
-/* Glassmorphism */
+/* Glassmorphism & Elevation matching Level 1, 2, 3 in shopifydesignskills.md */
 .glass-panel {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -73,79 +77,26 @@
 }
 
 .light .glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e4e4e7;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
 }
 
+/* Glass Card & Level 3 Stacked Paper Halo Shadow */
 .glass-card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: all 0.2s ease;
 }
 
 .dark .glass-card {
-  background: rgba(20, 20, 20, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(20, 20, 20, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .light .glass-card {
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-
-/* Light Theme Overrides for Dashboard Surfaces */
-.light .dashboard-shell {
-  background-color: #fbfbf5 !important;
-  color: #0f172a !important;
-}
-
-.light .dashboard-header {
-  background-color: rgba(251, 251, 245, 0.85) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-  color: #0f172a !important;
-}
-
-.light .dashboard-sidebar {
-  background-color: #f5f5ed !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-.light .dashboard-main {
-  background-color: #fbfbf5 !important;
-}
-
-.light .dashboard-shell h1,
-.light .dashboard-shell h2,
-.light .dashboard-shell h3,
-.light .dashboard-shell .text-white {
-  color: #0f172a !important;
-}
-
-.light .dashboard-shell p,
-.light .dashboard-shell .text-neutral-400 {
-  color: #64748b !important;
-}
-
-.light .dashboard-shell .text-neutral-500 {
-  color: #94a3b8 !important;
-}
-
-.light .dashboard-shell .border-white\/5,
-.light .dashboard-shell .border-white\/10 {
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-.light .dashboard-shell .bg-neutral-900\/60,
-.light .dashboard-shell .bg-neutral-900,
-.light .dashboard-shell .bg-black\/40 {
-  background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-.light .dashboard-shell .bg-white\/5 {
-  background-color: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 8px 8px rgba(0,0,0,0.03), 0 4px 4px rgba(0,0,0,0.02), 0 2px 2px rgba(0,0,0,0.02), 0 0 0 1px rgba(0,0,0,0.04);
 }
 
 /* Pill CTA Buttons */
@@ -154,7 +105,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background-color: #0f172a;
+  background-color: #000000;
   color: #ffffff;
   font-weight: 500;
   padding: 0.75rem 1.5rem;
@@ -167,7 +118,7 @@
 }
 
 .btn-pill-primary:hover {
-  opacity: 0.9;
+  opacity: 0.92;
   transform: translateY(-1px);
 }
 
@@ -176,26 +127,26 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background-color: rgba(0, 0, 0, 0.05);
-  color: #0f172a;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #d4d4d8;
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
 }
 
 .dark .btn-pill-secondary {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.06);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn-pill-secondary:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: #f4f4f5;
 }
 
 .dark .btn-pill-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -205,7 +156,8 @@
   justify-content: center;
   border-radius: 9999px;
   background-color: #c1fbd4;
-  color: #0b1416;
+  color: #000000;
+  border: 1px solid rgba(16, 185, 129, 0.2);
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   transition: all 0.2s ease;
@@ -218,7 +170,7 @@
 
 /* Gradients */
 .gradient-text {
-  background: linear-gradient(135deg, #0f172a 0%, #64748b 100%);
+  background: linear-gradient(135deg, #000000 0%, #52525b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -230,7 +182,7 @@
 }
 
 .gradient-mint-text {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  background: linear-gradient(135deg, #047857 0%, #10b981 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

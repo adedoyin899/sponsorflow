@@ -104,22 +104,26 @@ export default function SettingsPage() {
 
     try {
       const res = await fetch("/api/settings", {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           first_name: firstName,
           last_name: lastName,
           target_job_title: targetJobTitle,
           location,
-          target_salary_gbp: Number(targetSalary),
+          target_salary_gbp: targetSalary,
           requires_sponsorship: requiresSponsorship,
           portfolio_url: portfolioUrl,
           linkedin_url: linkedinUrl,
-          daily_limit: Number(dailyLimit),
-          hourly_limit: Number(hourlyLimit),
+          daily_limit: dailyLimit,
+          hourly_limit: hourlyLimit,
           writing_tone: writingTone,
+          sending_window_start: sendingWindowStart,
+          sending_window_end: sendingWindowEnd,
           ai_model: aiModel,
+          anthropic_api_key: anthropicApiKey || undefined,
           email_signature: signature,
+          theme_preference: theme,
         }),
       });
 
@@ -129,79 +133,101 @@ export default function SettingsPage() {
       }
 
       setSaveMessage("Settings saved successfully!");
-      setTimeout(() => setSaveMessage(null), 3500);
+      setTimeout(() => setSaveMessage(null), 4000);
     } catch (err: any) {
-      setErrorMessage(err.message || "An unexpected error occurred");
+      setErrorMessage(err.message || "An unexpected error occurred while saving.");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleExportData = () => {
-    const exportPayload = {
-      user: { firstName, lastName, email, targetJobTitle, location },
-      preferences: { dailyLimit, hourlyLimit, writingTone, aiModel },
+    const data = {
+      profile: {
+        firstName,
+        lastName,
+        email,
+        targetJobTitle,
+        location,
+        targetSalary,
+        requiresSponsorship,
+        portfolioUrl,
+        linkedinUrl,
+      },
+      outreach: {
+        dailyLimit,
+        hourlyLimit,
+        writingTone,
+        sendingWindowStart,
+        sendingWindowEnd,
+      },
+      ai: {
+        model: aiModel,
+        signature,
+      },
       exportedAt: new Date().toISOString(),
+      platform: "SponsorFlow v0.1",
     };
-    const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `sponsorflow-export-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `sponsorflow-settings-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const tabs = [
     { id: "profile", label: "Profile & Positioning", icon: User },
-    { id: "outreach", label: "Outreach & Safety Caps", icon: Shield },
-    { id: "ai", label: "Claude AI Personalization", icon: Sparkles },
+    { id: "outreach", label: "Outreach & Safety Limits", icon: Shield },
+    { id: "ai", label: "Claude AI Configuration", icon: Sparkles },
     { id: "appearance", label: "Appearance & Theme", icon: Palette },
-    { id: "integrations", label: "Integrations & Health", icon: Key },
-    { id: "data", label: "Data Management", icon: Database },
+    { id: "integrations", label: "Connected Services", icon: Database },
+    { id: "data", label: "Data Management", icon: Key },
   ];
 
   return (
     <div className="space-y-8 max-w-5xl">
-      {/* Top Header */}
+      {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-brand-aloe font-medium mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs text-emerald-800 dark:text-brand-aloe font-medium mb-1">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Platform Configuration</span>
+            <span>Platform Controls & Personalization</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
             Settings & Preferences
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400">
-            Manage your candidate profile, Gmail dispatch caps, Claude AI model parameters, and interface theme.
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+            Configure candidate positioning, safety rate-limiting caps, Claude prompts, and interface theme.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Button
-            type="button"
             variant="aloe"
-            size="md"
-            onClick={() => handleSave()}
-            isLoading={isSaving}
-            className="gap-2 shadow-lg shadow-brand-aloe/10"
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="gap-1.5"
           >
-            <Save className="w-4 h-4" /> Save Changes
+            <Save className={`w-3.5 h-3.5 ${isSaving ? "animate-spin" : ""}`} />
+            {isSaving ? "Saving Changes..." : "Save Changes"}
           </Button>
         </div>
       </div>
 
-      {/* Save / Error Alerts */}
+      {/* Save / Error Feedback Toast */}
       {saveMessage && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+        <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-400 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
           <span>{saveMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2 animate-in fade-in">
+        <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-xs text-red-700 dark:text-red-400 flex items-center gap-2 animate-in fade-in">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
@@ -221,15 +247,15 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                     isActive
-                      ? "bg-brand-aloe/15 text-brand-aloe dark:text-brand-aloe border border-brand-aloe/30 shadow-sm"
-                      : "text-neutral-400 hover:text-white dark:hover:text-white hover:bg-white/5"
+                      ? "bg-brand-aloe/30 dark:bg-brand-aloe/15 text-neutral-950 dark:text-brand-aloe border border-brand-aloe/50 dark:border-brand-aloe/30 shadow-sm font-semibold"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/5"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? "text-brand-aloe" : "text-neutral-400"}`} />
+                    <Icon className={`w-4 h-4 ${isActive ? "text-emerald-800 dark:text-brand-aloe" : "text-neutral-500 dark:text-neutral-400"}`} />
                     <span>{tab.label}</span>
                   </div>
-                  <ChevronRight className={`w-3 h-3 opacity-40 ${isActive ? "opacity-100 text-brand-aloe" : ""}`} />
+                  <ChevronRight className={`w-3 h-3 opacity-40 ${isActive ? "opacity-100 text-emerald-800 dark:text-brand-aloe" : ""}`} />
                 </button>
               );
             })}
@@ -237,17 +263,17 @@ export default function SettingsPage() {
 
           {/* Quick Stats Pill */}
           <Card variant="glass" className="p-4 space-y-2 text-xs">
-            <div className="flex items-center justify-between text-neutral-400">
+            <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
               <span>Account Mode</span>
               <Badge variant="aloe" className="text-[10px]">Verified Member</Badge>
             </div>
-            <div className="flex items-center justify-between text-neutral-400">
+            <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
               <span>Email Cap</span>
-              <span className="font-semibold text-white">{dailyLimit} / day</span>
+              <span className="font-semibold text-neutral-950 dark:text-white">{dailyLimit} / day</span>
             </div>
-            <div className="flex items-center justify-between text-neutral-400">
+            <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
               <span>Theme</span>
-              <span className="font-semibold text-white capitalize">{theme}</span>
+              <span className="font-semibold text-neutral-950 dark:text-white capitalize">{theme}</span>
             </div>
           </Card>
         </div>
@@ -257,9 +283,9 @@ export default function SettingsPage() {
           {/* TAB 1: Profile & Positioning */}
           {activeTab === "profile" && (
             <Card variant="glass" className="p-6 space-y-6">
-              <div className="border-b border-white/10 pb-4">
-                <h3 className="text-base font-semibold text-white">Candidate Positioning</h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+              <div className="border-b border-neutral-200/80 dark:border-white/10 pb-4">
+                <h3 className="text-base font-semibold text-neutral-950 dark:text-white">Candidate Positioning</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   These details feed into Claude's prompt context when drafting tailored cold outreach.
                 </p>
               </div>
@@ -326,12 +352,12 @@ export default function SettingsPage() {
               </div>
 
               {/* Visa Sponsorship Toggle */}
-              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/[0.03] border border-neutral-200/80 dark:border-white/10 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-white block">
+                  <span className="text-xs font-semibold text-neutral-950 dark:text-white block">
                     Require UK Skilled Worker Sponsorship
                   </span>
-                  <span className="text-[11px] text-neutral-400">
+                  <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                     Filters outreach targets to verified Home Office sponsor license holders.
                   </span>
                 </div>
@@ -339,7 +365,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => setRequiresSponsorship(!requiresSponsorship)}
                   className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors ${
-                    requiresSponsorship ? "bg-brand-aloe" : "bg-neutral-800"
+                    requiresSponsorship ? "bg-brand-aloe" : "bg-neutral-300 dark:bg-neutral-800"
                   }`}
                 >
                   <div
@@ -355,9 +381,9 @@ export default function SettingsPage() {
           {/* TAB 2: Outreach & Safety Caps */}
           {activeTab === "outreach" && (
             <Card variant="glass" className="p-6 space-y-6">
-              <div className="border-b border-white/10 pb-4">
-                <h3 className="text-base font-semibold text-white">Gmail Dispatch Safety Caps</h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+              <div className="border-b border-neutral-200/80 dark:border-white/10 pb-4">
+                <h3 className="text-base font-semibold text-neutral-950 dark:text-white">Gmail Dispatch Safety Caps</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Protect your Google sender reputation with hard daily and hourly dispatch limits.
                 </p>
               </div>
@@ -365,7 +391,7 @@ export default function SettingsPage() {
               {/* Daily Limit Slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-white">Daily Dispatch Limit</span>
+                  <span className="font-semibold text-neutral-950 dark:text-white">Daily Dispatch Limit</span>
                   <Badge variant="aloe">{dailyLimit} emails / day</Badge>
                 </div>
                 <input
@@ -377,7 +403,7 @@ export default function SettingsPage() {
                   onChange={(e) => setDailyLimit(Number(e.target.value))}
                   className="w-full accent-brand-aloe cursor-pointer"
                 />
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                   Recommended: 20/day for personalized cold outreach to avoid spam folder algorithms.
                 </p>
               </div>
@@ -385,7 +411,7 @@ export default function SettingsPage() {
               {/* Hourly Burst Limit Slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-white">Hourly Burst Limiter</span>
+                  <span className="font-semibold text-neutral-950 dark:text-white">Hourly Burst Limiter</span>
                   <Badge variant="outline">{hourlyLimit} emails / hour</Badge>
                 </div>
                 <input
@@ -397,14 +423,14 @@ export default function SettingsPage() {
                   onChange={(e) => setHourlyLimit(Number(e.target.value))}
                   className="w-full accent-brand-aloe cursor-pointer"
                 />
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                   Maximum emails sent in any rolling 60-minute window.
                 </p>
               </div>
 
               {/* Writing Tone Selector */}
               <div className="space-y-3">
-                <span className="text-xs font-semibold text-white block">
+                <span className="text-xs font-semibold text-neutral-950 dark:text-white block">
                   Default Writing Tone
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -418,11 +444,11 @@ export default function SettingsPage() {
                       onClick={() => setWritingTone(t.id as any)}
                       className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
                         writingTone === t.id
-                          ? "bg-brand-aloe/10 border-brand-aloe text-white shadow-sm"
-                          : "bg-white/[0.02] border-white/10 text-neutral-400 hover:border-white/20"
+                          ? "bg-emerald-50 dark:bg-brand-aloe/10 border-emerald-500 dark:border-brand-aloe text-neutral-950 dark:text-white shadow-sm"
+                          : "bg-neutral-50 dark:bg-white/[0.02] border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300"
                       }`}
                     >
-                      <span className="font-semibold text-white block mb-1">{t.title}</span>
+                      <span className="font-semibold text-neutral-950 dark:text-white block mb-1">{t.title}</span>
                       <span className="text-[11px] leading-relaxed">{t.desc}</span>
                     </div>
                   ))}
@@ -450,20 +476,20 @@ export default function SettingsPage() {
           {/* TAB 3: Claude AI Personalization */}
           {activeTab === "ai" && (
             <Card variant="glass" className="p-6 space-y-6">
-              <div className="border-b border-white/10 pb-4">
-                <h3 className="text-base font-semibold text-white">Claude AI Engine</h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+              <div className="border-b border-neutral-200/80 dark:border-white/10 pb-4">
+                <h3 className="text-base font-semibold text-neutral-950 dark:text-white">Claude AI Engine</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Configure the underlying Anthropic intelligence parameters and custom signature.
                 </p>
               </div>
 
               {/* Model Choice */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-white">Anthropic Model</label>
+                <label className="text-xs font-semibold text-neutral-950 dark:text-white">Anthropic Model</label>
                 <select
                   value={aiModel}
                   onChange={(e) => setAiModel(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs focus:outline-none focus:border-brand-aloe"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-white/10 text-neutral-900 dark:text-white text-xs focus:outline-none focus:border-brand-aloe shadow-sm"
                 >
                   <option value="claude-3-5-sonnet-20241022">
                     Claude 3.5 Sonnet (Recommended — Highest Conversion & Nuance)
@@ -489,15 +515,15 @@ export default function SettingsPage() {
 
               {/* Email Signature */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-white">Custom Email Signature</label>
+                <label className="text-xs font-semibold text-neutral-950 dark:text-white">Custom Email Signature</label>
                 <textarea
                   value={signature}
                   onChange={(e) => setSignature(e.target.value)}
                   rows={4}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs focus:outline-none focus:border-brand-aloe resize-none font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-white/10 text-neutral-900 dark:text-white text-xs focus:outline-none focus:border-brand-aloe resize-none font-mono shadow-sm leading-relaxed"
                   placeholder="Best,&#10;Your Name&#10;Portfolio: https://..."
                 />
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                   Appended automatically to generated drafts before entering review queue.
                 </p>
               </div>
@@ -507,9 +533,9 @@ export default function SettingsPage() {
           {/* TAB 4: Appearance & Theme */}
           {activeTab === "appearance" && (
             <Card variant="glass" className="p-6 space-y-6">
-              <div className="border-b border-white/10 pb-4">
-                <h3 className="text-base font-semibold text-white">Interface & Visual Theme</h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+              <div className="border-b border-neutral-200/80 dark:border-white/10 pb-4">
+                <h3 className="text-base font-semibold text-neutral-950 dark:text-white">Interface & Visual Theme</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Select your preferred palette. Light mode provides a high-contrast Shopify cream-mint canvas.
                 </p>
               </div>
@@ -520,11 +546,11 @@ export default function SettingsPage() {
                   onClick={() => setTheme("dark")}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col gap-3 ${
                     theme === "dark"
-                      ? "border-brand-aloe bg-brand-aloe/10 shadow-lg shadow-brand-aloe/5"
-                      : "border-white/10 bg-neutral-900/60 hover:border-white/20"
+                      ? "border-emerald-500 dark:border-brand-aloe bg-emerald-50/50 dark:bg-brand-aloe/10 shadow-lg shadow-brand-aloe/5"
+                      : "border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-neutral-900/60 hover:border-neutral-300"
                   }`}
                 >
-                  <div className="w-full h-20 rounded-xl bg-black border border-white/10 p-2.5 flex flex-col justify-between">
+                  <div className="w-full h-20 rounded-xl bg-black border border-neutral-800 p-2.5 flex flex-col justify-between">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full bg-red-400/80" />
                       <div className="w-2 h-2 rounded-full bg-amber-400/80" />
@@ -537,12 +563,12 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Moon className="w-4 h-4 text-brand-aloe" />
-                      <span className="text-xs font-semibold text-white">Dark Mode</span>
+                      <Moon className="w-4 h-4 text-emerald-700 dark:text-brand-aloe" />
+                      <span className="text-xs font-semibold text-neutral-950 dark:text-white">Dark Mode</span>
                     </div>
-                    {theme === "dark" && <CheckCircle2 className="w-4 h-4 text-brand-aloe" />}
+                    {theme === "dark" && <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-brand-aloe" />}
                   </div>
-                  <span className="text-[11px] text-neutral-400 leading-relaxed">
+                  <span className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
                     Cinematic night black with glowing aloe & pistachio accents.
                   </span>
                 </div>
@@ -552,8 +578,8 @@ export default function SettingsPage() {
                   onClick={() => setTheme("light")}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col gap-3 ${
                     theme === "light"
-                      ? "border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/5"
-                      : "border-white/10 bg-neutral-900/60 hover:border-white/20"
+                      ? "border-emerald-500 bg-emerald-50/60 shadow-lg shadow-emerald-500/10"
+                      : "border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-neutral-900/60 hover:border-neutral-300"
                   }`}
                 >
                   <div className="w-full h-20 rounded-xl bg-[#fbfbf5] border border-neutral-300 p-2.5 flex flex-col justify-between">
@@ -569,12 +595,12 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sun className="w-4 h-4 text-amber-400" />
-                      <span className="text-xs font-semibold text-white">Light Mode</span>
+                      <Sun className="w-4 h-4 text-amber-500" />
+                      <span className="text-xs font-semibold text-neutral-950 dark:text-white">Light Mode</span>
                     </div>
-                    {theme === "light" && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+                    {theme === "light" && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
                   </div>
-                  <span className="text-[11px] text-neutral-400 leading-relaxed">
+                  <span className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
                     Shopify cream-mint canvas with crisp typography and card surfaces.
                   </span>
                 </div>
@@ -584,29 +610,29 @@ export default function SettingsPage() {
                   onClick={() => setTheme("system")}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col gap-3 ${
                     theme === "system"
-                      ? "border-sky-400 bg-sky-400/10 shadow-lg shadow-sky-400/5"
-                      : "border-white/10 bg-neutral-900/60 hover:border-white/20"
+                      ? "border-sky-500 bg-sky-50/60 dark:bg-sky-400/10 shadow-lg shadow-sky-400/5"
+                      : "border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-neutral-900/60 hover:border-neutral-300"
                   }`}
                 >
-                  <div className="w-full h-20 rounded-xl bg-gradient-to-r from-black via-neutral-800 to-[#fbfbf5] border border-white/10 p-2.5 flex flex-col justify-between">
+                  <div className="w-full h-20 rounded-xl bg-gradient-to-r from-black via-neutral-800 to-[#fbfbf5] border border-neutral-300 dark:border-white/10 p-2.5 flex flex-col justify-between">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full bg-red-400/80" />
                       <div className="w-2 h-2 rounded-full bg-amber-400/80" />
                       <div className="w-2 h-2 rounded-full bg-emerald-400/80" />
                     </div>
                     <div className="space-y-1">
-                      <div className="w-3/4 h-2 rounded bg-white/30" />
-                      <div className="w-1/2 h-2 rounded bg-white/20" />
+                      <div className="w-3/4 h-2 rounded bg-white/40" />
+                      <div className="w-1/2 h-2 rounded bg-white/30" />
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Monitor className="w-4 h-4 text-sky-400" />
-                      <span className="text-xs font-semibold text-white">System Sync</span>
+                      <Monitor className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                      <span className="text-xs font-semibold text-neutral-950 dark:text-white">System Sync</span>
                     </div>
-                    {theme === "system" && <CheckCircle2 className="w-4 h-4 text-sky-400" />}
+                    {theme === "system" && <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />}
                   </div>
-                  <span className="text-[11px] text-neutral-400 leading-relaxed">
+                  <span className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
                     Automatically matches your macOS / browser color preference.
                   </span>
                 </div>
@@ -617,26 +643,26 @@ export default function SettingsPage() {
           {/* TAB 5: Integrations & Health */}
           {activeTab === "integrations" && (
             <Card variant="glass" className="p-6 space-y-6">
-              <div className="border-b border-white/10 pb-4">
-                <h3 className="text-base font-semibold text-white">Integrations & Service Health</h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+              <div className="border-b border-neutral-200/80 dark:border-white/10 pb-4">
+                <h3 className="text-base font-semibold text-neutral-950 dark:text-white">Integrations & Service Health</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Verify connection to external transports, databases, and webhook listeners.
                 </p>
               </div>
 
               <div className="space-y-3">
                 {/* Gmail Integration Card */}
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/[0.03] border border-neutral-200/80 dark:border-white/10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center">
                       <Mail className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-white">Gmail OAuth 2.0</span>
+                        <span className="text-xs font-semibold text-neutral-950 dark:text-white">Gmail OAuth 2.0</span>
                         <Badge variant="aloe" className="text-[10px]">Connected</Badge>
                       </div>
-                      <span className="text-[11px] text-neutral-400">
+                      <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                         Outbound sending & reply monitoring active.
                       </span>
                     </div>
@@ -649,45 +675,45 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Supabase PostgreSQL Card */}
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/[0.03] border border-neutral-200/80 dark:border-white/10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                       <Database className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-white">Supabase PostgreSQL 15</span>
-                        <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30">
+                        <span className="text-xs font-semibold text-neutral-950 dark:text-white">Supabase PostgreSQL 15</span>
+                        <Badge variant="outline" className="text-[10px] text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
                           17 Tables Active
                         </Badge>
                       </div>
-                      <span className="text-[11px] text-neutral-400">
+                      <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                         Row-Level Security (RLS) multi-tenant isolation enforced.
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Healthy
                   </span>
                 </div>
 
                 {/* Pub/Sub Webhook Card */}
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/[0.03] border border-neutral-200/80 dark:border-white/10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 flex items-center justify-center">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-white">Google Cloud Pub/Sub Webhook</span>
+                        <span className="text-xs font-semibold text-neutral-950 dark:text-white">Google Cloud Pub/Sub Webhook</span>
                         <Badge variant="aloe" className="text-[10px]">Live Edge Route</Badge>
                       </div>
-                      <span className="text-[11px] text-neutral-400">
-                        Endpoint: <code>/api/gmail/webhook</code>
+                      <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
+                        Endpoint: <code className="font-mono">/api/gmail/webhook</code>
                       </span>
                     </div>
                   </div>
-                  <span className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> 200 OK
                   </span>
                 </div>
@@ -698,20 +724,20 @@ export default function SettingsPage() {
           {/* TAB 6: Data Management */}
           {activeTab === "data" && (
             <Card variant="glass" className="p-6 space-y-6">
-              <div className="border-b border-white/10 pb-4">
-                <h3 className="text-base font-semibold text-white">Data Management & Privacy</h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
+              <div className="border-b border-neutral-200/80 dark:border-white/10 pb-4">
+                <h3 className="text-base font-semibold text-neutral-950 dark:text-white">Data Management & Privacy</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
                   Export your campaign data or manage account state.
                 </p>
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-neutral-50 dark:bg-white/[0.03] border border-neutral-200/80 dark:border-white/10 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold text-white block">
+                    <span className="text-xs font-semibold text-neutral-950 dark:text-white block">
                       Export Campaign Data (JSON)
                     </span>
-                    <span className="text-[11px] text-neutral-400">
+                    <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                       Download full profile, positioning angles, and email logs.
                     </span>
                   </div>
@@ -726,12 +752,12 @@ export default function SettingsPage() {
                   </Button>
                 </div>
 
-                <div className="p-4 rounded-xl bg-red-500/[0.04] border border-red-500/20 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/[0.04] border border-red-200 dark:border-red-500/20 flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-semibold text-red-400 block">
+                    <span className="text-xs font-semibold text-red-700 dark:text-red-400 block">
                       Danger Zone: Reset Demo State
                     </span>
-                    <span className="text-[11px] text-neutral-400">
+                    <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                       Clears local cache, temporary drafted emails, and resets demo counters.
                     </span>
                   </div>

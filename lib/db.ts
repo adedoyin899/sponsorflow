@@ -985,20 +985,37 @@ export async function getAndResetSendLimits(userId: string): Promise<SendLimitsR
 
   // Auto-create if not present
   if (!limits) {
-    const { data: created } = await (supabase
-      .from("send_limits")
-      .insert({
-        user_id: userId,
-        daily_limit: 20,
-        hourly_limit: 5,
-        emails_sent_today: 0,
-        emails_sent_this_hour: 0,
-        last_reset_date: todayDate,
-        last_reset_hour: currentHour,
-      })
-      .select()
-      .single() as unknown as Promise<{ data: SendLimitsRow | null }>);
-    return created!;
+    try {
+      const { data: created } = await (supabase
+        .from("send_limits")
+        .insert({
+          user_id: userId,
+          daily_limit: 20,
+          hourly_limit: 5,
+          emails_sent_today: 0,
+          emails_sent_this_hour: 0,
+          last_reset_date: todayDate,
+          last_reset_hour: currentHour,
+        })
+        .select()
+        .single() as unknown as Promise<{ data: SendLimitsRow | null }>);
+      if (created) return created;
+    } catch {
+      // Continue to fallback
+    }
+
+    return {
+      id: "default-limits",
+      user_id: userId,
+      daily_limit: 20,
+      hourly_limit: 5,
+      emails_sent_today: 0,
+      emails_sent_this_hour: 0,
+      last_reset_date: todayDate,
+      last_reset_hour: currentHour,
+      created_at: now.toISOString(),
+      updated_at: now.toISOString(),
+    };
   }
 
   // Check resets

@@ -163,11 +163,11 @@ export function EmailGenerator({
   return (
     <Card variant="glass" className="p-6 space-y-6">
       {/* Company Selector Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200/80 dark:border-white/5">
         <div className="space-y-1.5 flex-1">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-brand-aloe" />
-            <span className="text-xs font-semibold text-white uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 text-emerald-700 dark:text-brand-aloe" />
+            <span className="text-xs font-semibold text-neutral-950 dark:text-white uppercase tracking-wider">
               Claude AI Generation Engine
             </span>
           </div>
@@ -177,7 +177,7 @@ export function EmailGenerator({
               value={selectedCompanyId}
               onChange={(e) => handleCompanyChange(e.target.value)}
               disabled={isLoadingCompanies || isGenerating}
-              className="w-full appearance-none bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 pr-8 text-xs text-white focus:outline-none focus:border-brand-aloe/50 font-medium"
+              className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-xl px-3 py-2 pr-8 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-950 dark:focus:border-brand-aloe/50 font-medium shadow-sm"
             >
               {companies.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -185,12 +185,12 @@ export function EmailGenerator({
                 </option>
               ))}
             </select>
-            <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-4 h-4 text-neutral-500 dark:text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           {selectedCompany?.personalization_hook && (
-            <p className="text-[11px] text-neutral-400 line-clamp-1">
-              Hook: <span className="text-neutral-300">{selectedCompany.personalization_hook}</span>
+            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 line-clamp-1">
+              Hook: <span className="text-neutral-900 dark:text-neutral-300 font-medium">{selectedCompany.personalization_hook}</span>
             </p>
           )}
         </div>
@@ -203,7 +203,7 @@ export function EmailGenerator({
             disabled={isGenerating || !selectedCompanyId}
             className="gap-1.5"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? "animate-spin text-brand-aloe" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? "animate-spin text-emerald-600 dark:text-brand-aloe" : ""}`} />
             Regenerate
           </Button>
 
@@ -216,7 +216,7 @@ export function EmailGenerator({
           >
             {isApproved ? (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Approved
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Approved
               </>
             ) : isApproving ? (
               <>
@@ -232,7 +232,7 @@ export function EmailGenerator({
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-xs text-red-700 dark:text-red-400 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -241,16 +241,18 @@ export function EmailGenerator({
       {/* Meta Indicators */}
       <div className="flex flex-wrap items-center gap-2 text-xs">
         {positioningAngle && (
-          <Badge variant="outline" className="border-brand-aloe/30 text-brand-aloe">
+          <Badge variant="aloe">
             Angle: {positioningAngle}
           </Badge>
         )}
-        <Badge variant="outline" className="text-neutral-400">
+        <Badge variant="outline">
           Model: {aiModel}
         </Badge>
         <span
           className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${
-            isWordCountIdeal ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
+            isWordCountIdeal
+              ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400"
+              : "bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400"
           }`}
         >
           {wordCount} words {isWordCountIdeal ? "✓ (Ideal 70–150)" : "⚠ (Target 70–150)"}
@@ -260,7 +262,7 @@ export function EmailGenerator({
       {/* Draft Form Fields */}
       <div className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-neutral-400 mb-1">
+          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-400 mb-1">
             Subject Line
           </label>
           <input
@@ -272,16 +274,16 @@ export function EmailGenerator({
             }}
             placeholder="Subject line will be generated by Claude..."
             disabled={isGenerating}
-            className="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-aloe/50 focus:outline-none"
+            className="w-full bg-white dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-900 dark:text-white focus:border-brand-aloe/80 focus:outline-none shadow-sm font-medium"
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-neutral-400">
+            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-400">
               Personalized Email Body
             </label>
-            <span className="text-[11px] text-neutral-500">
+            <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
               Click to edit directly before approving
             </span>
           </div>
@@ -298,7 +300,7 @@ export function EmailGenerator({
                 : "Email body will appear here..."
             }
             disabled={isGenerating}
-            className="w-full bg-neutral-900/90 border border-neutral-800 rounded-xl p-4 text-xs text-white font-mono leading-relaxed focus:border-brand-aloe/50 focus:outline-none resize-y"
+            className="w-full bg-white dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-800 rounded-xl p-4 text-xs text-neutral-900 dark:text-white font-mono leading-relaxed focus:border-brand-aloe/80 focus:outline-none resize-y shadow-sm"
           />
         </div>
       </div>

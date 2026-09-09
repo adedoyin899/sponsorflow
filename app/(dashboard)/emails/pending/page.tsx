@@ -80,14 +80,14 @@ export default function PendingEmailsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-brand-aloe font-medium mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs text-emerald-800 dark:text-brand-aloe font-medium mb-1">
             <Mail className="w-3.5 h-3.5" />
             <span>Human-In-The-Loop Approval System</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
             Pending Outreach Review
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
             Every AI email must be reviewed, edited, or approved by you before entering the outbound dispatch queue.
           </p>
         </div>
@@ -112,32 +112,32 @@ export default function PendingEmailsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card variant="glass" className="p-4 flex items-center justify-between">
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 block font-medium">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-medium">
               Pending Review
             </span>
-            <span className="text-2xl font-light text-amber-400">{pendingEmails.length}</span>
+            <span className="text-2xl font-light text-amber-600 dark:text-amber-400">{pendingEmails.length}</span>
           </div>
-          <Badge variant="outline" className="text-amber-400 border-amber-400/30">
+          <Badge variant="warning">
             Awaiting Approval
           </Badge>
         </Card>
 
         <Card variant="glass" className="p-4 flex items-center justify-between">
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 block font-medium">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-medium">
               Approved & Queued
             </span>
-            <span className="text-2xl font-light text-brand-aloe">{approvedEmails.length}</span>
+            <span className="text-2xl font-light text-emerald-700 dark:text-brand-aloe">{approvedEmails.length}</span>
           </div>
           <Badge variant="aloe">Ready to Send</Badge>
         </Card>
 
         <Card variant="glass" className="p-4 flex items-center justify-between">
           <div>
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 block font-medium">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-medium">
               Total Drafted
             </span>
-            <span className="text-2xl font-light text-white">{emails.length}</span>
+            <span className="text-2xl font-light text-neutral-950 dark:text-white">{emails.length}</span>
           </div>
           <Badge variant="outline">All Outreach</Badge>
         </Card>
@@ -148,13 +148,13 @@ export default function PendingEmailsPage() {
 
       {/* Search & Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 rounded-xl p-1 text-xs">
+        <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-1 text-xs">
           <button
             onClick={() => setStatusFilter("pending")}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               statusFilter === "pending"
-                ? "bg-neutral-800 text-white font-medium"
-                : "text-neutral-400 hover:text-white"
+                ? "bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white font-semibold shadow-sm"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
             }`}
           >
             Pending Review ({pendingEmails.length})
@@ -163,8 +163,8 @@ export default function PendingEmailsPage() {
             onClick={() => setStatusFilter("ready_to_send")}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               statusFilter === "ready_to_send"
-                ? "bg-brand-aloe/20 text-brand-aloe font-medium"
-                : "text-neutral-400 hover:text-white"
+                ? "bg-brand-aloe/30 dark:bg-brand-aloe/20 text-emerald-950 dark:text-brand-aloe font-semibold shadow-sm"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
             }`}
           >
             Approved ({approvedEmails.length})
@@ -173,8 +173,8 @@ export default function PendingEmailsPage() {
             onClick={() => setStatusFilter("all")}
             className={`px-3 py-1.5 rounded-lg transition-all ${
               statusFilter === "all"
-                ? "bg-neutral-800 text-white font-medium"
-                : "text-neutral-400 hover:text-white"
+                ? "bg-white dark:bg-neutral-800 text-neutral-950 dark:text-white font-semibold shadow-sm"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white"
             }`}
           >
             All ({emails.length})
@@ -182,13 +182,13 @@ export default function PendingEmailsPage() {
         </div>
 
         <div className="relative w-full sm:w-64">
-          <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search company or subject..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-neutral-900 border border-neutral-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-neutral-500 focus:outline-none focus:border-brand-aloe/50"
+            className="w-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:border-brand-aloe/80 shadow-sm"
           />
         </div>
       </div>
@@ -196,10 +196,10 @@ export default function PendingEmailsPage() {
       {/* Empty State */}
       {filtered.length === 0 && !isLoading && (
         <Card variant="glass" className="p-12 text-center space-y-3">
-          <Mail className="w-10 h-10 text-neutral-600 mx-auto" />
+          <Mail className="w-10 h-10 text-neutral-400 dark:text-neutral-600 mx-auto" />
           <div className="space-y-1">
-            <h3 className="text-sm font-medium text-white">No outreach emails found</h3>
-            <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+            <h3 className="text-sm font-medium text-neutral-950 dark:text-white">No outreach emails found</h3>
+            <p className="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto">
               {statusFilter === "pending"
                 ? "You have reviewed all pending drafts! Generate more outreach from your target sponsor directory."
                 : "No emails match your active filter."}
@@ -224,19 +224,19 @@ export default function PendingEmailsPage() {
             <Card
               key={email.id}
               variant="glass"
-              className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-white/10 transition-all cursor-pointer"
+              className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all cursor-pointer"
               onClick={() => handleOpenReview(email)}
             >
               <div className="space-y-1.5 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-white text-sm tracking-tight">
+                  <span className="font-semibold text-neutral-950 dark:text-white text-sm tracking-tight">
                     {compName}
                   </span>
-                  <span className="text-xs text-neutral-400">— Hi {contactName}</span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">— Hi {contactName}</span>
                   <Badge variant="outline">{industry}</Badge>
 
                   {email.status === "draft" && (
-                    <Badge variant="outline" className="text-amber-400 border-amber-400/30 text-[10px]">
+                    <Badge variant="warning" className="text-[10px]">
                       Pending Review
                     </Badge>
                   )}
@@ -246,17 +246,17 @@ export default function PendingEmailsPage() {
                     </Badge>
                   )}
                   {email.status === "rejected" && (
-                    <Badge variant="outline" className="text-red-400 border-red-400/30 text-[10px]">
+                    <Badge variant="danger" className="text-[10px]">
                       Skipped
                     </Badge>
                   )}
                 </div>
 
-                <p className="text-xs text-neutral-200 font-medium line-clamp-1">
+                <p className="text-xs text-neutral-800 dark:text-neutral-200 font-medium line-clamp-1">
                   Subject: {email.subject}
                 </p>
 
-                <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed font-mono">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-2 leading-relaxed font-mono">
                   {email.body.slice(0, 140)}...
                 </p>
               </div>

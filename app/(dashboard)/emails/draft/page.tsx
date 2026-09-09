@@ -15,14 +15,14 @@ export default function EmailDraftPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-brand-aloe font-medium mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs text-emerald-800 dark:text-brand-aloe font-medium mb-1">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Claude AI Cold Outreach Generator</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
             Draft Personalized Outreach
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
             Select any target UK sponsor company. Claude will synthesize your positioning into high-converting 70–150 word peer outreach.
           </p>
         </div>

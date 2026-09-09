@@ -39,6 +39,14 @@ const config: Config = {
           dark: "#1e2c31",
           subtle: "rgba(255,255,255,0.08)",
         },
+        ink: "#000000",
+        "on-primary": "#ffffff",
+        "link-cool": {
+          1: "#9dabad",
+          2: "#9797a2",
+          3: "#bdbdca",
+          mint: "#99b3ad",
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "Helvetica", "Arial", "sans-serif"],
@@ -52,6 +60,7 @@ const config: Config = {
         elevated: "0 10px 30px -10px rgba(0,0,0,0.3)",
         glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
         card: "0 2px 12px rgba(0, 0, 0, 0.04)",
+        paper: "0 8px 8px rgba(0,0,0,0.04), 0 4px 4px rgba(0,0,0,0.03), 0 2px 2px rgba(0,0,0,0.02), 0 0 0 1px rgba(0,0,0,0.06)",
       },
     },
   },

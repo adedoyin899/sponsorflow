@@ -16,14 +16,14 @@ export default function EmailsDashboardPage() {
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-brand-aloe font-medium mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs text-emerald-800 dark:text-brand-aloe font-medium mb-1">
             <Sparkles className="w-3.5 h-3.5" />
             <span>AI Personalization Engine</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-light text-neutral-950 dark:text-white tracking-tight">
             Outreach Pipeline & Approvals
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-400">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
             Generate tailored cold emails with Claude AI, review personalized hooks, and approve for outbound dispatch.
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function EmailsDashboardPage() {
       {/* Main Grid: Interactive Generator + Review Queue */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-7 space-y-4">
-          <h2 className="text-sm font-semibold text-white">Live Email Draft Generator</h2>
+          <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">Live Email Draft Generator</h2>
           <EmailGenerator onEmailUpdated={() => setRefreshCount((c) => c + 1)} />
         </div>
 
