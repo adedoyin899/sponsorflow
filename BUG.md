@@ -81,7 +81,15 @@ Every bug entry should follow this structure:
 - **Description**: The top navigation bar always displayed `doyin@example.com` regardless of which account was authenticated.
 - **Root Cause**: `DashboardLayout` passed a hardcoded string `userEmail="doyin@example.com"` to `Header`.
 - **Resolution**: Removed hardcoded prop and updated `Header.tsx` to dynamically query `/api/auth/me` on mount to display the actual authenticated user's email, with a fallback to "Member".
-- **Prevention**: Always decouple user session state from presentation layout wrappers.
+### BUG-006: Strict UUID Validator on `/api/emails` Rejecting Demo and Fallback Draft IDs
+- **Date**: 2026-09-15
+- **Severity**: High
+- **Component**: Email Approval API / Validation
+- **Status**: [Resolved ✅]
+- **Description**: Calling `POST /api/emails` with demo or fallback draft IDs (e.g. `"draft-59txouf"`) returned `400 Validation failed: Invalid email ID`.
+- **Root Cause**: `updateEmailSchema` strictly required `z.string().uuid()`, which failed when approving emails generated with non-UUID fallback draft IDs.
+- **Resolution**: Updated `updateEmailSchema` in [`app/api/emails/route.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/app/api/emails/route.ts) to accept `z.string().min(1, "Invalid email ID")`. Also fortified `updateUserProfile` and `getFullProfile` in [`lib/db.ts`](file:///Users/oyeniyiadedoyin/Desktop/Anti%20gravity%20Projects/Sponsorflow/lib/db.ts) with offline demo fallbacks.
+- **Prevention**: Consistently use `z.string().min(1)` for entity ID references across user-facing APIs where mock or external IDs may be present.
 
 ---
 

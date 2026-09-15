@@ -46,13 +46,13 @@ function SaveBadge({ status }: { status: SaveStatus }) {
   if (status === "idle") return null;
   return (
     <div className={`
-      inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full transition-all duration-300
-      ${status === "saving" ? "bg-neutral-800 text-neutral-400" : ""}
-      ${status === "saved" ? "bg-brand-aloe/15 text-brand-aloe" : ""}
-      ${status === "error" ? "bg-red-500/15 text-red-400" : ""}
+      inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium transition-all duration-300
+      ${status === "saving" ? "bg-neutral-900 text-neutral-200" : ""}
+      ${status === "saved" ? "bg-emerald-100/90 text-emerald-900 border border-emerald-300/60 dark:bg-brand-aloe/15 dark:text-brand-aloe dark:border-transparent" : ""}
+      ${status === "error" ? "bg-red-500/15 text-red-600 dark:text-red-400" : ""}
     `}>
       {status === "saving" && <Loader2 className="w-3 h-3 animate-spin" />}
-      {status === "saved" && <CheckCircle2 className="w-3 h-3" />}
+      {status === "saved" && <CheckCircle2 className="w-3 h-3 text-emerald-700 dark:text-brand-aloe" />}
       {status === "saving" ? "Saving…" : status === "saved" ? "Saved" : "Save failed"}
     </div>
   );

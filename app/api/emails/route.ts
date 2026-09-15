@@ -34,7 +34,7 @@ export async function GET(req: Request) {
 }
 
 const updateEmailSchema = z.object({
-  email_id: z.string().uuid("Invalid email ID"),
+  email_id: z.string().min(1, "Invalid email ID"),
   status: z.enum([
     "draft",
     "approved",

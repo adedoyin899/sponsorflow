@@ -131,7 +131,7 @@ export async function POST(req: Request) {
       requiresSponsorship: profile?.requires_sponsorship ?? true,
       targetSalary: profile?.target_salary_gbp || 85000,
       professionalSummary: profile?.professional_summary || undefined,
-      writingTone: profile?.writing_tone || "warm",
+      writingTone: (profile?.writing_tone as "warm" | "direct" | "formal") || "warm",
       linkedinUrl: profile?.linkedin_url || undefined,
       portfolioUrl: profile?.portfolio_url || undefined,
       industries: profile?.industries || [],

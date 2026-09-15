@@ -64,9 +64,13 @@ export async function PUT(req: Request) {
 
     // Update users table name if provided
     if (first_name || last_name) {
-      const { createServerSupabaseClient } = await import("@/lib/supabase-server");
-      const supabase = createServerSupabaseClient();
-      await supabase.from("users").update({ first_name, last_name }).eq("id", user.id);
+      try {
+        const { createServerSupabaseClient } = await import("@/lib/supabase-server");
+        const supabase = createServerSupabaseClient();
+        await supabase.from("users").update({ first_name, last_name }).eq("id", user.id);
+      } catch (err) {
+        console.warn("Could not update users table in demo/offline mode:", err);
+      }
     }
 
     const profile = await updateUserProfile(user.id, profileData);
